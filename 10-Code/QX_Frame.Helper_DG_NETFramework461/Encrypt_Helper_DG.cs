@@ -163,24 +163,20 @@ namespace QX_Frame.Helper_DG
         /// <param name="sKey">密钥，必须24位</param>
         /// <param name="sIV_12bit">向量，必须是8个字符</param>
         /// <returns>加密后的字符串</returns>
-        public static string DES3_Encrypt(string Content, string sKey_24bit, string sIV_8bit)
+        public static string DES3_Encrypt(string Content, string sKey_24bit, string sIV_8bit= "qx_frame")
         {
             try
             {
-                ICryptoTransform ct;
-                MemoryStream ms;
-                CryptoStream cs;
-                byte[] byt;
                 mCSP.Key = Encoding.UTF8.GetBytes(sKey_24bit);
                 mCSP.IV = Encoding.UTF8.GetBytes(sIV_8bit);
                 //指定加密的运算模式
                 mCSP.Mode = System.Security.Cryptography.CipherMode.ECB;
                 //获取或设置加密算法的填充模式
                 mCSP.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
-                ct = mCSP.CreateEncryptor(mCSP.Key, mCSP.IV);//创建加密对象
-                byt = Encoding.UTF8.GetBytes(Content);
-                ms = new MemoryStream();
-                cs = new CryptoStream(ms, ct, CryptoStreamMode.Write);
+                ICryptoTransform ct = mCSP.CreateEncryptor(mCSP.Key, mCSP.IV);//创建加密对象
+                byte[] byt = Encoding.UTF8.GetBytes(Content);
+                MemoryStream ms = new MemoryStream();
+                CryptoStream cs = new CryptoStream(ms, ct, CryptoStreamMode.Write);
                 cs.Write(byt, 0, byt.Length);
                 cs.FlushFinalBlock();
                 cs.Close();
@@ -198,24 +194,20 @@ namespace QX_Frame.Helper_DG
         /// <param name="sKey">密钥，必须24位</param>
         /// <param name="sIV_12bit">向量，必须是8个字符</param>
         /// <returns>解密后的字符串</returns>
-        public static string DES3_Decrypt(string encryptedContent, string sKey_24bit, string sIV_8bit)
+        public static string DES3_Decrypt(string encryptedContent, string sKey_24bit, string sIV_8bit= "qx_frame")
         {
             try
             {
-                ICryptoTransform ct;//加密转换运算
-                MemoryStream ms;//内存流
-                CryptoStream cs;//数据流连接到数据加密转换的流
-                byte[] byt;
                 //将3DES的密钥转换成byte
                 mCSP.Key = Encoding.UTF8.GetBytes(sKey_24bit);
                 //将3DES的向量转换成byte
                 mCSP.IV = Encoding.UTF8.GetBytes(sIV_8bit);
                 mCSP.Mode = System.Security.Cryptography.CipherMode.ECB;
                 mCSP.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
-                ct = mCSP.CreateDecryptor(mCSP.Key, mCSP.IV);//创建对称解密对象
-                byt = Convert.FromBase64String(encryptedContent);
-                ms = new MemoryStream();
-                cs = new CryptoStream(ms, ct, CryptoStreamMode.Write);
+                ICryptoTransform ct = mCSP.CreateDecryptor(mCSP.Key, mCSP.IV);//加密转换运算,创建对称解密对象
+                byte[] byt = Convert.FromBase64String(encryptedContent);
+                MemoryStream ms = new MemoryStream();//内存流
+                CryptoStream cs = new CryptoStream(ms, ct, CryptoStreamMode.Write);//数据流连接到数据加密转换的流
                 cs.Write(byt, 0, byt.Length);
                 cs.FlushFinalBlock();
                 cs.Close();
@@ -240,6 +232,85 @@ namespace QX_Frame.Helper_DG
             byte[] inArray = Convert.FromBase64String(content);
             return System.Text.Encoding.UTF8.GetString(inArray);
         }
+        #endregion
+
+        #region 混淆与反混淆
+
+        /// <summary>
+        /// The timestamp length.
+        /// </summary>
+        private const int TimestampLength = 36;
+
+        /// <summary>
+        /// 用时间简单混淆
+        /// </summary>
+        /// <param name="str">原字符串</param>
+        /// <returns>混淆后字符串</returns>
+        public static string MixUp(string str)
+        {
+            var guid = Guid.NewGuid().ToString();
+            var count = str.Length + TimestampLength;
+            var sbd = new StringBuilder(count);
+            int j = 0;
+            int k = 0;
+            for (int i = 0; i < count; i++)
+            {
+                if (j < TimestampLength && k < str.Length)
+                {
+                    if (i % 2 == 0)
+                    {
+                        sbd.Append(str[k]);
+                        k++;
+                    }
+                    else
+                    {
+                        sbd.Append(guid[j]);
+                        j++;
+                    }
+                }
+                else if (j >= TimestampLength)
+                {
+                    sbd.Append(str[k]);
+                    k++;
+                }
+                else if (k >= str.Length)
+                {
+                    break;
+                }
+            }
+
+            return sbd.ToString();
+        }
+
+        /// <summary>
+        /// 简单反混淆
+        /// </summary>
+        /// <param name="str">混淆后字符串</param>
+        /// <returns>原来字符串</returns>
+        public static string ReMixUp(string str)
+        {
+            var sbd = new StringBuilder();
+            int j = 0;
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    sbd.Append(str[i]);
+                }
+                else
+                {
+                    j++;
+                }
+
+                if (j > TimestampLength)
+                {
+                    sbd.Append(str.Substring(i));
+                    break;
+                }
+            }
+            return sbd.ToString();
+        }
+
         #endregion
     }
 }

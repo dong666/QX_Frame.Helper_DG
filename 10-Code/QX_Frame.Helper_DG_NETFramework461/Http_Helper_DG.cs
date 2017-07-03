@@ -16,7 +16,7 @@ namespace QX_Frame.Helper_DG
     /// <summary>
     /// Http Client Helper
     /// </summary>
-    public class HttpClient_Helper_DG
+    public class Http_Helper_DG
     {
         public static string CommonHttpRequest(string uri, string data,  string type,string contentType= "application/x-www-form-urlencoded")
         {

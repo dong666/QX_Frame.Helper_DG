@@ -57,6 +57,9 @@
     <Reference Include="NPOI.OpenXmlFormats">
       <HintPath>..\QX_Frame.Reference\SelfRefrence\Office\NPOI.OpenXmlFormats.dll</HintPath>
     </Reference>
+    <Reference Include="RabbitMQ.Client, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
+      <HintPath>..\packages\RabbitMQ.Client.4.1.3\lib\net451\RabbitMQ.Client.dll</HintPath>
+    </Reference>
     <Reference Include="ServiceStack.Common, Version=4.5.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ServiceStack.Common.4.5.8\lib\net45\ServiceStack.Common.dll</HintPath>
     </Reference>
@@ -109,6 +112,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Redis_Helper_DG.cs" />
     <Compile Include="Return_Helper_DG.cs" />
+    <Compile Include="Service\RabbitMQ_Service_DG.cs" />
     <Compile Include="Sql_Helper_DG.cs" />
     <Compile Include="Sql_Helper_MS.cs" />
     <Compile Include="String_Helper_DG.cs" />

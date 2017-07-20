@@ -7,7 +7,10 @@ using QX_Frame.Helper_DG.Options;
 * */
 namespace QX_Frame.Helper_DG.Configs
 {
-    public class QX_Frame_Helper_DG_Config
+    public interface IQX_Frame_MSMQ
+    {
+    }
+    public class QX_Frame_Helper_DG_Config : IQX_Frame_MSMQ
     {
         #region database
 
@@ -53,6 +56,15 @@ namespace QX_Frame.Helper_DG.Configs
 
         #endregion
 
+        #region MSMQ
+
+        public static string MSMQ_RabbitMQ_Host { get; set; }
+        public static string MSMQ_RabbitMQ_UserName { get; set; }
+        public static string MSMQ_RabbitMQ_Password { get; set; }
+        public static string MSMQ_RabbitMQ_VirtualHost { get; set; }
+        public static ushort MSMQ_RabbitMQ_RequestedHeartBeat { get; set; }
+
+        #endregion
 
     }
 }

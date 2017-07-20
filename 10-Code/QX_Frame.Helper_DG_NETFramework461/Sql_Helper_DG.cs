@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Reflection;
 
 
@@ -658,6 +659,18 @@ namespace QX_Frame.Helper_DG
                 throw ex;
             }
         }
+
+        /// <summary>
+        /// 反射返回一个T类型的结果
+        /// </summary>
+        /// <typeparam name="T">Model中对象类型</typeparam>
+        /// <param name="ds">DataSet结果集</param>
+        /// <returns></returns>
+        public static T Return_T_ByDataReader<T>(DataSet ds)
+        {
+            return Return_List_T_ByDataSet<T>(ds).FirstOrDefault();
+        }
+
         #endregion
     }
 }

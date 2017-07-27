@@ -13,7 +13,7 @@ namespace QX_Frame.Helper_DG.Service
     public class RabbitMQ_Service_DG: IMSMQ_Service_DG
     {
         public string QueueName { get; set; }
-        public string ExchangeName { get; set; } = "topic_exchange_log";
+        public string ExchangeName { get; set; }
         public string ExchangeType { get; set; } = "topic";//direct，fanout，topic，headers
         public string RoutingKey { get; set; } = "*";
 
@@ -43,23 +43,6 @@ namespace QX_Frame.Helper_DG.Service
         void IMSMQ_Service_DG.BootStrap()
         {
             throw new NotImplementedException("Please Execute Overload Function That Have Arguments !");
-        }
-        /// <summary>
-        /// BootStrap
-        /// </summary>
-        /// <param name="queueName"></param>
-        public RabbitMQ_Service_DG BootStrap(string queueName)
-        {
-            this.QueueName = queueName;
-            this.ConnectFactory = new ConnectionFactory
-            {
-                UserName = QX_Frame_Helper_DG_Config.MSMQ_RabbitMQ_UserName,
-                Password = QX_Frame_Helper_DG_Config.MSMQ_RabbitMQ_Password,
-                VirtualHost = QX_Frame_Helper_DG_Config.MSMQ_RabbitMQ_VirtualHost,
-                RequestedHeartbeat = QX_Frame_Helper_DG_Config.MSMQ_RabbitMQ_RequestedHeartBeat,
-                Endpoint = new AmqpTcpEndpoint(new Uri(QX_Frame_Helper_DG_Config.MSMQ_RabbitMQ_Host))
-            };
-            return this;
         }
 
         /// <summary>
@@ -92,6 +75,10 @@ namespace QX_Frame.Helper_DG.Service
             if (this.ConnectFactory == null)
             {
                 throw new NullReferenceException("Must Execute BootStrap First !");
+            }
+            if (string.IsNullOrEmpty(this.ExchangeName))
+            {
+                throw new ArgumentException("ExchangeName Must Be Support , Please Call BootStrap(string queueName, string exchangeName) Or SetExchangeName(string exchangeName) To Setting Up !");
             }
             using (var connection = this.ConnectFactory.CreateConnection())
             {

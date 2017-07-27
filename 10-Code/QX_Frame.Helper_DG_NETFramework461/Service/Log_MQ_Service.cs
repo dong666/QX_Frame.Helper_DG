@@ -15,7 +15,7 @@ namespace QX_Frame.Helper_DG.Service
         {
             using (Log.Log log = new Log.Log(logType))
             {
-                this.rabbitMQ.BootStrap("log").SendMessage(log.ToJson());
+                this.rabbitMQ.BootStrap("log", "topic_exchange_log").SendMessage(log.ToJson());
             }
         }
 
@@ -23,7 +23,7 @@ namespace QX_Frame.Helper_DG.Service
         {
             using (Log.Log log = new Log.Log(logType, message))
             {
-                this.rabbitMQ.BootStrap("log").SendMessage(log.ToJson());
+                this.rabbitMQ.BootStrap("log", "topic_exchange_log").SendMessage(log.ToJson());
             }
         }
 
@@ -31,15 +31,15 @@ namespace QX_Frame.Helper_DG.Service
         {
             using (Log.Log log = new Log.Log(logType, request))
             {
-                this.rabbitMQ.BootStrap("log").SendMessage(log.ToJson());
+                this.rabbitMQ.BootStrap("log", "topic_exchange_log").SendMessage(log.ToJson());
             }
         }
 
         public void Log(LogType logType, HttpRequestMessage request, string message)
         {
-            using (Log.Log log = new Log.Log(logType, request,message))
+            using (Log.Log log = new Log.Log(logType, request, message))
             {
-                this.rabbitMQ.BootStrap("log").SendMessage(log.ToJson());
+                this.rabbitMQ.BootStrap("log", "topic_exchange_log").SendMessage(log.ToJson());
             }
         }
     }

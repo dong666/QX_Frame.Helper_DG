@@ -33,17 +33,17 @@ namespace QX_Frame.Helper_DG.Log
     /// <summary>
     /// log class
     /// </summary>
-    public class Log
+    public class Log:IDisposable
     {
         public string type { get; set; } = nameof(LogType.log);
         public string date { get => DateTime.Now.ToLongDateString(); }
         public string time { get => DateTime.Now.ToLongTimeString(); }
-        public string client_ip { get; set; }
+        public string client_ip { get; set; } = "";
         public string server_name { get => Ip_Helper_DG.GetServerHostName(); }
         public string server_ip { get => Ip_Helper_DG.GetServerIpAddress(); }
-        public string uri { get; set; }
-        public string parameters { get; set; }
-        public string message { get; set; }
+        public string uri { get; set; }="";
+        public string parameters { get; set; }="";
+        public string message { get; set; }="";
 
         public Log(LogType logType) => this.type = nameof(logType);
 
@@ -72,5 +72,15 @@ namespace QX_Frame.Helper_DG.Log
         /// </summary>
         /// <returns></returns>
         public string ToJson() => Convert_Helper_DG.T_To_Json(this).ToString();
+
+        public void Dispose()
+        {
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue 
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
+        }
     }
 }

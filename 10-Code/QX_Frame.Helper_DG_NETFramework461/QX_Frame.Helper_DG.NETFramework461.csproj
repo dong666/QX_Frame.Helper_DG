@@ -103,7 +103,9 @@
     <Compile Include="IO_Helper_DG.cs" />
     <Compile Include="Ip_Helper_DG.cs" />
     <Compile Include="ListPaging_Helper_DG.cs" />
-    <Compile Include="Log_Helper_DG.cs" />
+    <Compile Include="Log\Log.cs" />
+    <Compile Include="Service\Log_MQ_Service.cs" />
+    <Compile Include="Log_Helper_File_DG.cs" />
     <Compile Include="Mail_Helper_DG.cs" />
     <Compile Include="Office_Helper_DG.cs" />
     <Compile Include="Options\Opt_CacheServer.cs" />

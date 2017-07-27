@@ -13,7 +13,7 @@ namespace QX_Frame.Helper_DG.Service
     public class RabbitMQ_Service_DG: IMSMQ_Service_DG
     {
         public string QueueName { get; set; }
-        public string ExchangeName { get; set; } = "topicExchange1";
+        public string ExchangeName { get; set; } = "topic_exchange_log";
         public string ExchangeType { get; set; } = "topic";//direct，fanout，topic，headers
         public string RoutingKey { get; set; } = "*";
 

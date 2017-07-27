@@ -8,15 +8,15 @@ namespace QX_Frame.Helper_DG
     /// <summary>
     /// 20161030 14:27:23 qixiao
     /// </summary>
-    public abstract class Log_Helper_DG
+    public abstract class Log_Helper_File_DG
     {
         public static void Log(string logText, string logTitle = "QX_Frame General", Boolean isAppend = true)
         {
-            OutPutStreamWriter(QX_Frame_Helper_DG_Config.Log_Location_Use, logTitle, logText, isAppend);
+            OutPutStreamWriter(QX_Frame_Helper_DG_Config.Log_Location_General, logTitle, logText, isAppend);
         }
         public static void Log_Error(string logText, string logTitle = "QX_Frame Error", Boolean isAppend = true)
         {
-            OutPutStreamWriter(QX_Frame_Helper_DG_Config.Log_Location_Use, logTitle, logText, isAppend);
+            OutPutStreamWriter(QX_Frame_Helper_DG_Config.Log_Location_Error, logTitle, logText, isAppend);
         }
         public static void Log_Use(string logText, string logTitle = "QX_Frame USE", Boolean isAppend = true)
         {

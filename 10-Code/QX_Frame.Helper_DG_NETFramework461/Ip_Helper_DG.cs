@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,8 +49,33 @@ namespace QX_Frame.Helper_DG
                     return owinContext.Request.RemoteIpAddress;
                 }
             }
-
             return null;
+        }
+
+        /// <summary>
+        /// Get Server Host Name
+        /// </summary>
+        /// <returns></returns>
+        public static string GetServerHostName()
+        {
+            return Dns.GetHostName();
+        }
+
+        /// <summary>
+        /// Get Server Ip Address
+        /// </summary>
+        /// <returns></returns>
+        public static string GetServerIpAddress()
+        {
+            string hostName = Dns.GetHostName();
+
+            IPHostEntry localhost = Dns.GetHostByName(hostName);
+
+            //IPHostEntry localhost = Dns.GetHostEntry(hostName);   //获取IPv6地址
+
+            IPAddress localaddr = localhost.AddressList[0];
+
+            return localaddr.ToString();
         }
     }
 }

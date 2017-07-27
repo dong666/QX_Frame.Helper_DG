@@ -37,7 +37,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString());
+                Log_Helper_File_DG.Log_Error(ex.ToString());
                 return exceptionExecute();
             }
         }
@@ -49,7 +49,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString());
+                Log_Helper_File_DG.Log_Error(ex.ToString());
                 return exceptionExecute();
             }
         }
@@ -61,7 +61,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString());
+                Log_Helper_File_DG.Log_Error(ex.ToString());
                 return exceptionExecute();
             }
         }
@@ -76,7 +76,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 return default(E);
             }
         }
@@ -88,7 +88,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 return default(E);
             }
         }
@@ -100,7 +100,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 return default(E);
             }
         }
@@ -115,7 +115,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 return exceptionExecute();
             }
         }
@@ -127,7 +127,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 return exceptionExecute();
             }
         }
@@ -139,7 +139,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 return exceptionExecute();
             }
         }
@@ -185,7 +185,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
             }
         }
         public static void channel_Exception_Log<T>(T t, Action<T> methodExecute, string exceptionLogTitle = "ERROR")
@@ -196,7 +196,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
             }
         }
         public static void channel_Exception_Log<T>(T t, Predicate<T> conditionExecute, Action<T> methodExecute, string exceptionLogTitle = "ERROR")
@@ -207,7 +207,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
             }
         }
         #endregion
@@ -221,7 +221,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 exceptionExecute();
             }
         }
@@ -233,7 +233,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 exceptionExecute();
             }
         }
@@ -245,7 +245,7 @@ namespace QX_Frame.Helper_DG
             }
             catch (Exception ex)
             {
-                Log_Helper_DG.Log_Error(ex.ToString(), exceptionLogTitle);
+                Log_Helper_File_DG.Log_Error(ex.ToString(), exceptionLogTitle);
                 exceptionExecute();
             }
         }

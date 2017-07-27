@@ -3,8 +3,13 @@ using QX_Frame.Helper_DG.Extends;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Test.ConsoleApp1.NETFramework461.Config;
+using QX_Frame.Helper_DG.Service;
+using QX_Frame.Helper_DG.Log;
+using System.Threading;
 
 namespace Test.ConsoleApp1.NETFramework461
 {
@@ -16,10 +21,15 @@ namespace Test.ConsoleApp1.NETFramework461
 
             //---------
 
-            string test = "123456";
 
-            Console.WriteLine(Encrypt_Helper_DG.MixUp(test));
-            Console.WriteLine(Encrypt_Helper_DG.ReMixUp(Encrypt_Helper_DG.MixUp(test)));
+            Log_MQ_Service log = new Log_MQ_Service();
+
+            while (true)
+            {
+                Console.WriteLine("write to mq ...");
+                log.Log(LogType.error, "log test");
+                Thread.Sleep(10000);
+            }
 
 
             //---------

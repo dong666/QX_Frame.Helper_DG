@@ -90,16 +90,20 @@ namespace QX_Frame.Helper_DG
                 IQueryable<T> iqueryable = Cache_Helper_DG.Cache_Get($"{nameof(Db)}_{nameof(T)}") as IQueryable<T>;
                 if (iqueryable == null)
                 {
-                    DbContext db = GetCurrentDbContext();
-                    iqueryable = db.Set<T>().AsExpandable();
-                    Cache_Helper_DG.Cache_Add($"{nameof(Db)}_{nameof(T)}", iqueryable, QX_Frame_Helper_DG_Config.Cache_CacheExpirationTimeSpan_Minutes);
+                    using (DbContext db = GetCurrentDbContext())
+                    {
+                        iqueryable = db.Set<T>().AsExpandable();
+                        Cache_Helper_DG.Cache_Add($"{nameof(Db)}_{nameof(T)}", iqueryable, QX_Frame_Helper_DG_Config.Cache_CacheExpirationTimeSpan_Minutes);
+                    }
                 }
                 return iqueryable;
             }
             else
             {
-                DbContext db = GetCurrentDbContext();
-                return db.Set<T>().AsExpandable();
+                using (DbContext db = GetCurrentDbContext())
+                {
+                    return db.Set<T>().AsExpandable();
+                }
             }
         }
 

@@ -9,10 +9,11 @@ using QX_Frame.Helper_DG.Configs;
 /**
  * author:qixiao
  * create:2017-6-5 10:47:01
+ * update:2017-7-28 23:26:13
  * */
 namespace QX_Frame.Helper_DG
 {
-    public class Redis_Helper_DG
+    public class Redis_Helper_DG : IDisposable
     {
         /// <summary>
         /// client
@@ -20,26 +21,99 @@ namespace QX_Frame.Helper_DG
         private static IRedisClient client;
 
         /// <summary>
-        /// singleton object
+        /// pooled redis lient manager
         /// </summary>
-        private static readonly object lockHelper = new object();
+        private static PooledRedisClientManager _prcm;
+
         static Redis_Helper_DG()
         {
-            if (client == null)
+            CreateManager();
+        }
+
+        /// <summary>  
+        /// 创建链接池管理对象  
+        /// </summary>  
+        private static void CreateManager()
+        {
+            string redisPath = new StringBuilder().Append(QX_Frame_Helper_DG_Config.Cache_Redis_Host).Append(":").Append(QX_Frame_Helper_DG_Config.Cache_Redis_Port).ToString();
+            _prcm = CreateManager(new string[] { redisPath }, new string[] { redisPath });
+        }
+
+        private static PooledRedisClientManager CreateManager(string[] readWriteHosts, string[] readOnlyHosts)
+        {
+            //WriteServerList：可写的Redis链接地址。  
+            //ReadServerList：可读的Redis链接地址。  
+            //MaxWritePoolSize：最大写链接数。  
+            //MaxReadPoolSize：最大读链接数。  
+            //AutoStart：自动重启。  
+            //LocalCacheTime：本地缓存到期时间，单位:秒。  
+            //RecordeLog：是否记录日志,该设置仅用于排查redis运行时出现的问题,如redis工作正常,请关闭该项。  
+            //RedisConfigInfo类是记录redis连接信息，此信息和配置文件中的RedisConfig相呼应  
+
+            // 支持读写分离，均衡负载   
+            return new PooledRedisClientManager(readWriteHosts, readOnlyHosts, new RedisClientManagerConfig
             {
-                lock (lockHelper)
+                MaxWritePoolSize = 10, // “写”链接池链接数   
+                MaxReadPoolSize = 10, // “读”链接池链接数   
+                AutoStart = true,
+            });
+        }
+
+        private static IEnumerable<string> SplitString(string strSource, string split)
+        {
+            return strSource.Split(split.ToArray());
+        }
+
+        /// <summary>  
+        /// Client
+        /// </summary>  
+        public IRedisClient GetClient()
+        {
+            if (_prcm == null)
+            {
+                CreateManager();
+            }
+            return _prcm.GetClient();
+        }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        private bool _disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
                 {
-                    if (client == null)
-                        client = new RedisClient(QX_Frame_Helper_DG_Config.Cache_Redis_Host, QX_Frame_Helper_DG_Config.Cache_Redis_Port);
+                    if (client != null)
+                    {
+                        client = null;
+                        client.Dispose();
+                    }
                 }
             }
+            this._disposed = true;
         }
-        /// <summary>
-        /// Get RedisClient
-        /// </summary>
-        public static IRedisClient Client
+        public void Dispose()
         {
-            get => client;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        /// <summary>  
+        /// 保存数据DB文件到硬盘  
+        /// </summary>  
+        public void Save()
+        {
+            client.Save();
+        }
+        /// <summary>  
+        /// 异步保存数据DB文件到硬盘  
+        /// </summary>  
+        public void SaveAsync()
+        {
+            client.SaveAsync();
         }
     }
 }

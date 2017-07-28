@@ -10,6 +10,7 @@ using Test.ConsoleApp1.NETFramework461.Config;
 using QX_Frame.Helper_DG.Service;
 using QX_Frame.Helper_DG.Log;
 using System.Threading;
+using ServiceStack.Redis;
 
 namespace Test.ConsoleApp1.NETFramework461
 {
@@ -21,15 +22,25 @@ namespace Test.ConsoleApp1.NETFramework461
 
             //---------
 
+            Console.WriteLine(Cache_Helper_DG.CacheCount);
+            Cache_Helper_DG.Cache_Add("1", "111");
+            Cache_Helper_DG.Cache_Add("2", "222");
+            Cache_Helper_DG.Cache_Add("3", "333");
+            Cache_Helper_DG.Cache_Add("4", "444");
+            Cache_Helper_DG.Cache_Add("5", "555");
+            Cache_Helper_DG.Cache_Add("6", "666");
+            Cache_Helper_DG.Cache_Add("7", "777");
+            Cache_Helper_DG.Cache_Add("8", "888");
+            Cache_Helper_DG.Cache_Add("9", "999");
 
-            Log_MQ_Service log = new Log_MQ_Service();
+            Cache_Helper_DG.Cache_Add("a", "aaa");
+            Cache_Helper_DG.Cache_Add("b", "bbb");
+            Cache_Helper_DG.Cache_Add("c", "ccc");
 
-            while (true)
-            {
-                Console.WriteLine("write to mq ...");
-                log.Log(LogType.error, "log test");
-                Thread.Sleep(10000);
-            }
+            Console.WriteLine(Cache_Helper_DG.CacheCount);
+
+
+
 
 
             //---------

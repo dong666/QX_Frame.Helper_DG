@@ -250,7 +250,14 @@ namespace QX_Frame.Helper_DG
             {
                 throw new FileNotFoundException("the file not found in the filePath");
             }
-            object jobjectInCache = Cache_Helper_DG.Cache_Get(filePath);
+            string key = filePath;
+            if (key.Contains("/")||key.Contains("\\"))
+            {
+                key.Replace("\\", "/");
+                string[] array = key.Split('/');
+                key = array[array.Length - 1];
+            }
+            object jobjectInCache = Cache_Helper_DG.Cache_Get(key);
             if (jobjectInCache!=null)
             {
                  jObject=(JObject)jobjectInCache;
@@ -258,11 +265,10 @@ namespace QX_Frame.Helper_DG
             else
             {
                 jObject= (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(ReadFileStringContent(filePath));
-                Cache_Helper_DG.Cache_Add(filePath,jObject);
+                Cache_Helper_DG.Cache_Add(key,jObject);
             }
             return jObject;
         }
-
         #endregion
     }
 }

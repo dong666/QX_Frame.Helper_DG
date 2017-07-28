@@ -28,7 +28,13 @@ namespace QX_Frame.Helper_DG
                 case Opt_CacheServer.HttpRuntimeCache:
                     return HttpRuntime.Cache[cacheKey];
                 case Opt_CacheServer.Redis:
-                    return Redis_Helper_DG.Client.Get<object>(cacheKey);
+                    using (Redis_Helper_DG redis = new Redis_Helper_DG())
+                    {
+                        using (IRedisClient client = redis.GetClient())
+                        {
+                            return client.Get<object>(cacheKey);
+                        }
+                    }
                 case Opt_CacheServer.Memcached:
                     throw new Exception("Opt_CacheServer Error !");
                 case Opt_CacheServer.SqlLite:
@@ -56,7 +62,13 @@ namespace QX_Frame.Helper_DG
                     HttpRuntime.Cache.Insert(cacheKey, cacheValue, dependencies, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(keepMinutes), CacheItemPriority.NotRemovable, cacheItemRemovedCallback);
                     return true;
                 case Opt_CacheServer.Redis:
-                    return Redis_Helper_DG.Client.Set(cacheKey, cacheValue, TimeSpan.FromMinutes(keepMinutes));
+                    using (Redis_Helper_DG redis = new Redis_Helper_DG())
+                    {
+                        using (IRedisClient client = redis.GetClient())
+                        {
+                            return client.Set(cacheKey, cacheValue, TimeSpan.FromMinutes(keepMinutes));
+                        }
+                    }
                 case Opt_CacheServer.Memcached:
                     throw new Exception("Opt_CacheServer Error !");
                 case Opt_CacheServer.SqlLite:
@@ -83,7 +95,13 @@ namespace QX_Frame.Helper_DG
                     HttpRuntime.Cache.Insert(cacheKey, cacheValue, dependencies, expireTime, Cache.NoSlidingExpiration, CacheItemPriority.NotRemovable, cacheItemRemovedCallback);
                     return true;
                 case Opt_CacheServer.Redis:
-                    return Redis_Helper_DG.Client.Set(cacheKey, cacheValue, expireTime);
+                    using (Redis_Helper_DG redis = new Redis_Helper_DG())
+                    {
+                        using (IRedisClient client = redis.GetClient())
+                        {
+                            return client.Set(cacheKey, cacheValue, expireTime);
+                        }
+                    }
                 case Opt_CacheServer.Memcached:
                     throw new Exception("Opt_CacheServer Error !");
                 case Opt_CacheServer.SqlLite:
@@ -106,7 +124,13 @@ namespace QX_Frame.Helper_DG
                     HttpRuntime.Cache.Remove(cacheKey);
                     return true;
                 case Opt_CacheServer.Redis:
-                    return Redis_Helper_DG.Client.Remove(cacheKey);
+                    using (Redis_Helper_DG redis = new Redis_Helper_DG())
+                    {
+                        using (IRedisClient client = redis.GetClient())
+                        {
+                            return client.Remove(cacheKey);
+                        }
+                    }
                 case Opt_CacheServer.Memcached:
                     throw new Exception("Opt_CacheServer Error !");
                 case Opt_CacheServer.SqlLite:
@@ -132,7 +156,14 @@ namespace QX_Frame.Helper_DG
             }
             else if (QX_Frame_Helper_DG_Config.Cache_CacheServer == Opt_CacheServer.Redis)
             {
-                Redis_Helper_DG.Client.FlushAll();
+                using (Redis_Helper_DG redis = new Redis_Helper_DG())
+                {
+                    using (IRedisClient client = redis.GetClient())
+                    {
+                        client.FlushAll();
+                        return true;
+                    }
+                }
             }
             else
             {
@@ -153,7 +184,13 @@ namespace QX_Frame.Helper_DG
                     case Opt_CacheServer.HttpRuntimeCache:
                         return HttpRuntime.Cache.Count;
                     case Opt_CacheServer.Redis:
-                        return Redis_Helper_DG.Client.GetAllKeys().Count;
+                        using (Redis_Helper_DG redis = new Redis_Helper_DG())
+                        {
+                            using (IRedisClient client = redis.GetClient())
+                            {
+                                return client.GetAllKeys().Count;
+                            }
+                        }
                     case Opt_CacheServer.Memcached:
                         throw new Exception("Opt_CacheServer Error !");
                     case Opt_CacheServer.SqlLite:

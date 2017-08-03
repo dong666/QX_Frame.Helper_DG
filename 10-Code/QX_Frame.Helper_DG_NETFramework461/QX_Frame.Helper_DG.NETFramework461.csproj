@@ -76,6 +76,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -98,6 +99,7 @@
     <Compile Include="Extends\Exception_DG.cs" />
     <Compile Include="Extends\ToTypesExtends.cs" />
     <Compile Include="File_Helper_DG.cs" />
+    <Compile Include="Graphic_Helper_DG.cs" />
     <Compile Include="Http_Helper_DG.cs" />
     <Compile Include="HttpRuntimeCache_Helper_DG.cs" />
     <Compile Include="IO_Helper_DG.cs" />

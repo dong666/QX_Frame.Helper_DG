@@ -14,7 +14,6 @@ namespace QX_Frame.Helper_DG
 {
     public class File_Helper_DG
     {
-
         #region Txt File Opreation
 
         public static Boolean Txt_Write(string filePath, string text, bool isAppend = true)
@@ -257,7 +256,7 @@ namespace QX_Frame.Helper_DG
                 string[] array = key.Split('/');
                 key = array[array.Length - 1];
             }
-            object jobjectInCache = Cache_Helper_DG.Cache_Get(key);
+            object jobjectInCache = HttpRuntimeCache_Helper_DG.Cache_Get(key);
             if (jobjectInCache!=null)
             {
                  jObject=(JObject)jobjectInCache;
@@ -265,7 +264,7 @@ namespace QX_Frame.Helper_DG
             else
             {
                 jObject= (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(ReadFileStringContent(filePath));
-                Cache_Helper_DG.Cache_Add(key,jObject);
+                HttpRuntimeCache_Helper_DG.Cache_Add(key,jObject);
             }
             return jObject;
         }

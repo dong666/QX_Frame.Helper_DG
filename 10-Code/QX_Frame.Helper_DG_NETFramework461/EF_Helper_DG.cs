@@ -54,12 +54,12 @@ namespace QX_Frame.Helper_DG
             //}
 
             //method 2 :
-            Db dbContext = Cache_Helper_DG.Cache_Get("dbContext") as Db;
+            Db dbContext = HttpRuntimeCache_Helper_DG.Cache_Get("dbContext") as Db;
             if (dbContext == null)
             {
                 //create a dbContext to memory if dbContext has not exist
                 dbContext = System.Activator.CreateInstance<Db>();
-                Cache_Helper_DG.Cache_Add("dbContext", dbContext);
+                HttpRuntimeCache_Helper_DG.Cache_Add("dbContext", dbContext);
             }
             return dbContext;
         }
@@ -74,7 +74,7 @@ namespace QX_Frame.Helper_DG
         {
             if (QX_Frame_Helper_DG_Config.Cache_IsCache)
             {
-                Cache_Helper_DG.Cache_Delete($"{nameof(Db)}_{nameof(T)}");
+                HttpRuntimeCache_Helper_DG.Cache_Delete($"{typeof(Db).Name}_{typeof(T).Name}");
             }
         }
 
@@ -87,11 +87,11 @@ namespace QX_Frame.Helper_DG
         {
             if (QX_Frame_Helper_DG_Config.Cache_IsCache)
             {
-                IQueryable<T> iqueryable = Cache_Helper_DG.Cache_Get($"{nameof(Db)}_{nameof(T)}") as IQueryable<T>;
+                IQueryable<T> iqueryable = HttpRuntimeCache_Helper_DG.Cache_Get($"{typeof(Db).Name}_{typeof(T).Name}") as IQueryable<T>;
                 if (iqueryable == null)
                 {
                     iqueryable = GetCurrentDbContext().Set<T>().AsExpandable();
-                    Cache_Helper_DG.Cache_Add($"{nameof(Db)}_{nameof(T)}", iqueryable, QX_Frame_Helper_DG_Config.Cache_CacheExpirationTimeSpan_Minutes);
+                    HttpRuntimeCache_Helper_DG.Cache_Add($"{typeof(Db).Name}_{typeof(T).Name}", iqueryable, QX_Frame_Helper_DG_Config.Cache_CacheExpirationTimeSpan_Minutes);
                 }
                 return iqueryable;
             }

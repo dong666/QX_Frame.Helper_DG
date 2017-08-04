@@ -15,8 +15,8 @@
   "cache": {
     "IsCache": 1,
     "CacheExpirationTime_Minutes": 10,
-    "Cache_Redis_Host": "101.201.66.247",
-    "Cache_Redis_Port": 6379
+    "Cache_Redis_Host_ReadWrite_Array": [ "101.201.66.247:6379" ],
+    "Cache_Redis_Host_OnlyRead_Array": [ "101.201.66.247:6379" ]
   },
   "authentication": {
     "AuthTokenExpireTime_days": 0,

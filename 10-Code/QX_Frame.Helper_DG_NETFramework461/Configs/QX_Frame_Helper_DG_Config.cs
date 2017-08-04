@@ -39,11 +39,11 @@ namespace QX_Frame.Helper_DG.Configs
         /// <summary>
         /// Host Default 127.0.0.1
         /// </summary>
-        public static string Cache_Redis_Host { get; set; } = "127.0.0.1";
+        public static string[] Cache_Redis_Host_ReadWrite_Array { get; set; } = { "127.0.0.1:6379" };
         /// <summary>
-        /// Port Default 6379
+        /// Host Default 127.0.0.1
         /// </summary>
-        public static int Cache_Redis_Port { get; set; } = 6379;
+        public static string[] Cache_Redis_Host_OnlyRead_Array { get; set; } = { "127.0.0.1:6379" };
 
         #endregion
 

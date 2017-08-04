@@ -35,8 +35,7 @@ namespace QX_Frame.Helper_DG
         /// </summary>  
         private static void CreateManager()
         {
-            string redisPath = new StringBuilder().Append(QX_Frame_Helper_DG_Config.Cache_Redis_Host).Append(":").Append(QX_Frame_Helper_DG_Config.Cache_Redis_Port).ToString();
-            _prcm = CreateManager(new string[] { redisPath }, new string[] { redisPath });
+            _prcm = CreateManager(QX_Frame_Helper_DG_Config.Cache_Redis_Host_ReadWrite_Array, QX_Frame_Helper_DG_Config.Cache_Redis_Host_OnlyRead_Array);
         }
 
         private static PooledRedisClientManager CreateManager(string[] readWriteHosts, string[] readOnlyHosts)
@@ -53,15 +52,10 @@ namespace QX_Frame.Helper_DG
             // 支持读写分离，均衡负载   
             return new PooledRedisClientManager(readWriteHosts, readOnlyHosts, new RedisClientManagerConfig
             {
-                MaxWritePoolSize = 10, // “写”链接池链接数   
-                MaxReadPoolSize = 10, // “读”链接池链接数   
+                MaxWritePoolSize = 20, // “写”链接池链接数   
+                MaxReadPoolSize = 20, // “读”链接池链接数   
                 AutoStart = true,
             });
-        }
-
-        private static IEnumerable<string> SplitString(string strSource, string split)
-        {
-            return strSource.Split(split.ToArray());
         }
 
         /// <summary>  

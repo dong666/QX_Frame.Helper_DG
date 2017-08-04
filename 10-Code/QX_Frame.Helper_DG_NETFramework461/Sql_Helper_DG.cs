@@ -666,7 +666,7 @@ namespace QX_Frame.Helper_DG
         /// <typeparam name="T">Model中对象类型</typeparam>
         /// <param name="ds">DataSet结果集</param>
         /// <returns></returns>
-        public static T Return_T_ByDataReader<T>(DataSet ds)
+        public static T Return_T_ByDataSet<T>(DataSet ds)
         {
             return Return_List_T_ByDataSet<T>(ds).FirstOrDefault();
         }

@@ -20,14 +20,18 @@ namespace QX_Frame.Helper_DG
     {
         #region ConStr链接字符串---ConStr链接字符串声明
         /// <summary>
-        /// 连接字符串 ConnString 公共静态只读 不允许进行修改 在后续调用中目前不支持代码修改链接字符串
+        /// 连接字符串 ConnString_RW 读写数据库使用
         /// </summary>
-        public static readonly string ConnString = QX_Frame.Helper_DG.Configs.QX_Frame_Helper_DG_Config.ConnectionString_DB_QX_Frame_Default;
+        public static string ConnString_RW = QX_Frame.Helper_DG.Configs.QX_Frame_Helper_DG_Config.ConnectionString_DB_QX_Frame_Default;
+        /// <summary>
+        /// 连接字符串 ConnString_R 读数据库使用
+        /// </summary>
+        public static string ConnString_R = QX_Frame.Helper_DG.Configs.QX_Frame_Helper_DG_Config.ConnectionString_DB_QX_Frame_Default;
         #endregion
 
         static Sql_Helper_DG()
         {
-            if (string.IsNullOrEmpty(ConnString))
+            if (string.IsNullOrEmpty(ConnString_RW)|| string.IsNullOrEmpty(ConnString_R))
             {
                 throw new ArgumentNullException("ConnString Can Not Be Null !");
             }
@@ -41,11 +45,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandTextOrSpName">sql语句或存储过程名称</param>
         /// <param name="commandType">命令类型 有默认值CommandType.Text</param>
         /// <returns>返回受影响的行数</returns>
-        public static int ExecuteNonQuery(string ConnString, string commandTextOrSpName, CommandType commandType = CommandType.Text)
+        public static int ExecuteNonQuery(string commandTextOrSpName, CommandType commandType = CommandType.Text)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_RW))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -67,11 +71,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型 t</param>
         /// <param name="parms">SqlParameter[]参数数组，允许空</param>
         /// <returns>返回受影响的行数</returns>
-        public static int ExecuteNonQuery(string ConnString, string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
+        public static int ExecuteNonQuery(string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_RW))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -93,11 +97,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型</param>
         /// <param name="obj">object[]参数数组，允许空</param>
         /// <returns>返回受影响的行数</returns>
-        public static int ExecuteNonQuery(string ConnString, string commandTextOrSpName, CommandType commandType, params object[] obj)
+        public static int ExecuteNonQuery(string commandTextOrSpName, CommandType commandType, params object[] obj)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_RW))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -121,11 +125,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandTextOrSpName">sql语句或存储过程名称</param>
         /// <param name="commandType">命令类型 有默认值CommandType.Text</param>
         /// <returns></returns>
-        public static object ExecuteScalar(string ConnString, string commandTextOrSpName, CommandType commandType = CommandType.Text)
+        public static object ExecuteScalar(string commandTextOrSpName, CommandType commandType = CommandType.Text)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -147,11 +151,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型</param>
         /// <param name="parms">SqlParameter[]参数数组，允许空</param>
         /// <returns></returns>
-        public static object ExecuteScalar(string ConnString, string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
+        public static object ExecuteScalar(string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -174,11 +178,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型</param>
         /// <param name="obj">object[]参数数组，允许空</param>
         /// <returns></returns>
-        public static object ExecuteScalar(string ConnString, string commandTextOrSpName, CommandType commandType, params object[] obj)
+        public static object ExecuteScalar(string commandTextOrSpName, CommandType commandType, params object[] obj)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -202,12 +206,12 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandTextOrSpName">sql语句或存储过程名称</param>
         /// <param name="commandType">命令类型 有默认值CommandType.Text</param>
         /// <returns></returns>
-        public static SqlDataReader ExecuteReader(string ConnString, string commandTextOrSpName, CommandType commandType = CommandType.Text)
+        public static SqlDataReader ExecuteReader(string commandTextOrSpName, CommandType commandType = CommandType.Text)
         {
             //sqlDataReader不能用using 会关闭conn 导致不能获取到返回值。注意：DataReader获取值时必须保持连接状态
             try
             {
-                SqlConnection conn = new SqlConnection(ConnString);
+                SqlConnection conn = new SqlConnection(ConnString_R);
                 SqlCommand cmd = new SqlCommand();
                 PreparCommand(conn, cmd, commandTextOrSpName, commandType);
                 return cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -225,12 +229,12 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型</param>
         /// <param name="parms">SqlParameter[]参数数组，允许空</param>
         /// <returns></returns>
-        public static SqlDataReader ExecuteReader(string ConnString, string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
+        public static SqlDataReader ExecuteReader(string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
         {
             //sqlDataReader不能用using 会关闭conn 导致不能获取到返回值。注意：DataReader获取值时必须保持连接状态
             try
             {
-                SqlConnection conn = new SqlConnection(ConnString);
+                SqlConnection conn = new SqlConnection(ConnString_R);
                 SqlCommand cmd = new SqlCommand();
                 PreparCommand(conn, cmd, commandTextOrSpName, commandType, parms);
                 return cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -248,12 +252,12 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型</param>
         /// <param name="obj">object[]参数数组，允许空</param>
         /// <returns></returns>
-        public static SqlDataReader ExecuteReader(string ConnString, string commandTextOrSpName, CommandType commandType, params object[] obj)
+        public static SqlDataReader ExecuteReader(string commandTextOrSpName, CommandType commandType, params object[] obj)
         {
             //sqlDataReader不能用using 会关闭conn 导致不能获取到返回值。注意：DataReader获取值时必须保持连接状态
             try
             {
-                SqlConnection conn = new SqlConnection(ConnString);
+                SqlConnection conn = new SqlConnection(ConnString_R);
                 SqlCommand cmd = new SqlCommand();
                 PreparCommand(conn, cmd, commandTextOrSpName, commandType, obj);
                 return cmd.ExecuteReader(CommandBehavior.CloseConnection);
@@ -279,11 +283,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandTextOrSpName">sql语句或存储过程名称</param>
         /// <param name="commandType">命令类型 有默认值CommandType.Text</param>
         /// <returns></returns>
-        public static DataTable ExecuteDataTable(string ConnString, string commandTextOrSpName, CommandType commandType = CommandType.Text)
+        public static DataTable ExecuteDataTable(string commandTextOrSpName, CommandType commandType = CommandType.Text)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -314,11 +318,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型</param>
         /// <param name="parms">SqlParameter[]参数数组，允许空</param>
         /// <returns></returns>
-        public static DataTable ExecuteDataTable(string ConnString, string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
+        public static DataTable ExecuteDataTable(string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -349,11 +353,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型 </param>
         /// <param name="obj">object[]参数数组，允许空</param>
         /// <returns></returns>
-        public static DataTable ExecuteDataTable(string ConnString, string commandTextOrSpName, CommandType commandType, params object[] obj)
+        public static DataTable ExecuteDataTable(string commandTextOrSpName, CommandType commandType, params object[] obj)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -386,11 +390,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandTextOrSpName">sql语句或存储过程名称</param>
         /// <param name="commandType">命令类型 有默认值CommandType.Text</param>
         /// <returns></returns>
-        public static DataSet ExecuteDataSet(string ConnString, string commandTextOrSpName, CommandType commandType = CommandType.Text)
+        public static DataSet ExecuteDataSet(string commandTextOrSpName, CommandType commandType = CommandType.Text)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -417,11 +421,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型</param>
         /// <param name="parms">SqlParameter[]参数数组，允许空</param>
         /// <returns></returns>
-        public static DataSet ExecuteDataSet(string ConnString, string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
+        public static DataSet ExecuteDataSet(string commandTextOrSpName, CommandType commandType, params SqlParameter[] parms)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {
@@ -448,11 +452,11 @@ namespace QX_Frame.Helper_DG
         /// <param name="commandType">命令类型 </param>
         /// <param name="obj">object[]参数数组，允许空</param>
         /// <returns></returns>
-        public static DataSet ExecuteDataSet(string ConnString, string commandTextOrSpName, CommandType commandType, params object[] obj)
+        public static DataSet ExecuteDataSet(string commandTextOrSpName, CommandType commandType, params object[] obj)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnString))
+                using (SqlConnection conn = new SqlConnection(ConnString_R))
                 {
                     using (SqlCommand cmd = new SqlCommand())
                     {

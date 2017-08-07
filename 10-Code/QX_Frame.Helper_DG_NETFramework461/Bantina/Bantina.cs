@@ -44,7 +44,7 @@ namespace QX_Frame.Helper_DG.Bantina
         {
             if (string.IsNullOrEmpty(ConnString_Default))
             {
-                throw new Exception_DG("ConnString_Default Must Be Declared When Initiation ! -- QX_Frame.Helper_DG.Bantina.BEF");
+                throw new Exception_DG("ConnString_Default Must Be Declared When Initiation ! -- QX_Frame.Helper_DG.Bantina");
             }
 
         }

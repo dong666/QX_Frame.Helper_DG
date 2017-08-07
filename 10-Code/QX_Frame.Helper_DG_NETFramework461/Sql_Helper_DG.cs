@@ -18,23 +18,39 @@ namespace QX_Frame.Helper_DG
     /// </summary>
     public abstract class Sql_Helper_DG
     {
-        #region ConStr链接字符串---ConStr链接字符串声明
+        #region ConnString 链接字符串声明
+
+        /// <summary>
+        /// 连接字符串 ConnString_Default 默认，且赋值时会直接覆盖掉读写
+        /// </summary>
+        private static string _connString = Configs.QX_Frame_Helper_DG_Config.ConnectionString_DB_QX_Frame_Default;
+        public static string ConnString_Default
+        {
+            get { return _connString; }
+            set
+            {
+                _connString = value;
+                ConnString_RW = _connString;
+                ConnString_R = _connString;
+            }
+        }
         /// <summary>
         /// 连接字符串 ConnString_RW 读写数据库使用
         /// </summary>
-        public static string ConnString_RW = QX_Frame.Helper_DG.Configs.QX_Frame_Helper_DG_Config.ConnectionString_DB_QX_Frame_Default;
+        public static string ConnString_RW = _connString;
         /// <summary>
         /// 连接字符串 ConnString_R 读数据库使用
         /// </summary>
-        public static string ConnString_R = QX_Frame.Helper_DG.Configs.QX_Frame_Helper_DG_Config.ConnectionString_DB_QX_Frame_Default;
+        public static string ConnString_R = _connString;
+
         #endregion
 
         static Sql_Helper_DG()
         {
-            if (string.IsNullOrEmpty(ConnString_RW)|| string.IsNullOrEmpty(ConnString_R))
-            {
-                throw new ArgumentNullException("ConnString Can Not Be Null !");
-            }
+            //if (string.IsNullOrEmpty(ConnString_RW) || string.IsNullOrEmpty(ConnString_R))
+            //{
+            //    throw new ArgumentNullException("ConnString Can Not Be Null !");
+            //}
         }
 
         #region ExcuteNonQuery 执行sql语句或者存储过程,返回影响的行数---ExcuteNonQuery

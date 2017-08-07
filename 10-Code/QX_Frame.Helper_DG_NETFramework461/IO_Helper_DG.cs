@@ -21,6 +21,16 @@ namespace QX_Frame.Helper_DG
             }
             return true;
         }
+        //create file
+        public static bool CreateFileIfNotExist(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath);
+            }
+            return true;
+        }
+
 
         public static string DeskTopPath
         {

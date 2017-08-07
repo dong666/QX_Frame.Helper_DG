@@ -87,6 +87,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bantina\AutoIncreaseAttribute.cs" />
+    <Compile Include="Bantina\Bantina.cs" />
+    <Compile Include="Bantina\ColumnAttribute.cs" />
+    <Compile Include="Bantina\KeyAttribute.cs" />
+    <Compile Include="Bantina\TableAttribute.cs" />
     <Compile Include="Cache_Helper_DG.cs" />
     <Compile Include="Code_Helper_DG.cs" />
     <Compile Include="Configs\QX_Frame_Helper_DG_Config.cs" />
@@ -97,6 +102,8 @@
     <Compile Include="Encrypt_Helper_DG.cs" />
     <Compile Include="Extends\CloneExtends.cs" />
     <Compile Include="Extends\Exception_DG.cs" />
+    <Compile Include="Extends\LambdaToSqlStatementClass.cs" />
+    <Compile Include="Extends\LambdaToSqlStatementInternal.cs" />
     <Compile Include="Extends\ToTypesExtends.cs" />
     <Compile Include="File_Helper_DG.cs" />
     <Compile Include="Graphic_Helper_DG.cs" />
@@ -124,7 +131,9 @@
     <Compile Include="Transaction_Helper_DG.cs" />
     <Compile Include="TypeConvert_Helper_DG.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />

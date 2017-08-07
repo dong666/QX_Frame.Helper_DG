@@ -18,7 +18,7 @@ namespace QX_Frame.Helper_DG
 
         public static Boolean Txt_Write(string filePath, string text, bool isAppend = true)
         {
-            IO_Helper_DG.CreateDirectoryIfNotExist(filePath);
+            IO_Helper_DG.CreateFileIfNotExist(filePath);
             using (StreamWriter log = new StreamWriter(filePath, isAppend))
             {
                 log.Write(text);
@@ -27,7 +27,7 @@ namespace QX_Frame.Helper_DG
         }
         public static Boolean Txt_WriteLine(string filePath, string text, bool isAppend = true)
         {
-            IO_Helper_DG.CreateDirectoryIfNotExist(filePath);
+            IO_Helper_DG.CreateFileIfNotExist(filePath);
             using (StreamWriter log = new StreamWriter(filePath, isAppend))
             {
                 log.WriteLine(text);

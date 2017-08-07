@@ -81,6 +81,7 @@ namespace QX_Frame.Helper_DG.Log
             // and prevent finalization code for this object
             // from executing a second time.
             GC.SuppressFinalize(this);
+            GC.Collect();
         }
     }
 }

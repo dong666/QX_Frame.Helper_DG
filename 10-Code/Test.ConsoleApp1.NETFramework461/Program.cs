@@ -25,28 +25,30 @@ namespace Test.ConsoleApp1.NETFramework461
 
             //---------
 
-            TB_People people1 = new TB_People { Name = "111" };
-            TB_People people2 = people1;
-            people1.Name = "44";
+            //TB_People people1 = new TB_People { Name = "111" };
+            //TB_People people2 = people1;
+            //people1.Name = "44";
 
 
-            string str1 = "csacsacascsa";
-            string str2 = "1233";
+            //string str1 = "csacsacascsa";
+            //string str2 = "1233";
 
-            Console.WriteLine(people1.GetHashCode());
-            Console.WriteLine(people2.GetHashCode());
+            //Console.WriteLine(people1.GetHashCode());
+            //Console.WriteLine(people2.GetHashCode());
 
 
 
-            //using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
-            //{
-            //    List<TB_People> peopleList = test.QueryEntitiesPaging<TB_People,string>(1,5,t=>t.Name, t => t.Name.StartsWith("li"),out int count,true);
-            //    foreach (var item in peopleList)
-            //    {
-            //    Console.WriteLine(item.Uid+ " "+ item.Name);
-            //    }
-            //    Console.WriteLine(count);
-            //}
+            using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            {
+                //List<TB_People> peopleList = test.QueryEntitiesPaging<TB_People, string>(1, 5, t => t.Name, t => t.Name.StartsWith("li"), out int count, true);
+                //foreach (var item in peopleList)
+                //{
+                //    Console.WriteLine(item.Uid + " " + item.Name);
+                //}
+                //Console.WriteLine(count);
+                Console.WriteLine(test.Exist<TB_People>(t=>t.Name.Equals("3")));
+                Console.WriteLine(test.Exist<TB_People>(t=>t.Name.Equals("3")));
+            }
 
 
 

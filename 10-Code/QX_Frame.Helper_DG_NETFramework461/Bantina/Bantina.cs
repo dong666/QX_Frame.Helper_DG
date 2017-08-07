@@ -59,21 +59,6 @@ namespace QX_Frame.Helper_DG.Bantina
 
         #endregion
 
-        #region prepare
-        /// <summary>
-        /// Get Table Name by Attribute
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private string GetTablaName(Type type)
-        {
-            object[] objs = type.GetCustomAttributes(typeof(TableAttribute), true);
-            if (objs.FirstOrDefault() is TableAttribute attr)
-                return !string.IsNullOrEmpty(attr.TableName) == true ? attr.TableName : type.Name;
-            return type.Name;
-        }
-        #endregion
-
         #region Add Method
 
         public async Task<bool> Add<TEntity>(TEntity entity) where TEntity : class
@@ -151,6 +136,9 @@ namespace QX_Frame.Helper_DG.Bantina
              {
                  result = ExecuteNonQuery(sql, System.Data.CommandType.Text, sqlParameterList.ToArray()) > 0;
              });
+
+            // Cache Deal:if Table change,we should renew the cache value
+            HttpRuntimeCache_Helper_DG.Cache_Add(tableName, result);
 
             return result;
         }
@@ -267,6 +255,9 @@ namespace QX_Frame.Helper_DG.Bantina
                 result = ExecuteNonQuery(sql, System.Data.CommandType.Text, sqlParameterList.ToArray()) > 0;
             });
 
+            // Cache Deal:if Table change,we should renew the cache value
+            HttpRuntimeCache_Helper_DG.Cache_Add(tableName, result);
+
             return result;
         }
 
@@ -374,12 +365,15 @@ namespace QX_Frame.Helper_DG.Bantina
                 result = ExecuteNonQuery(sql, System.Data.CommandType.Text, sqlParameterList.ToArray()) > 0;
             });
 
+            // Cache Deal:if Table change,we should renew the cache value
+            HttpRuntimeCache_Helper_DG.Cache_Add(tableName, result);
+
             return result;
         }
 
         #endregion
 
-        #region
+        #region Delete Method
 
         /// <summary>
         /// Delete Mothod : the [Key] Attribute must be provide!
@@ -451,6 +445,9 @@ namespace QX_Frame.Helper_DG.Bantina
                 result = ExecuteNonQuery(sql, System.Data.CommandType.Text, sqlParameterList.ToArray()) > 0;
             });
 
+            // Cache Deal:if Table change,we should renew the cache value
+            HttpRuntimeCache_Helper_DG.Cache_Add(tableName, result);
+
             return result;
         }
 
@@ -488,22 +485,15 @@ namespace QX_Frame.Helper_DG.Bantina
                 result = ExecuteNonQuery(sql, System.Data.CommandType.Text, sqlParameterList.ToArray()) > 0;
             });
 
+            // Cache Deal:if Table change,we should renew the cache value
+            HttpRuntimeCache_Helper_DG.Cache_Add(tableName, result);
+
             return result;
         }
 
         #endregion
 
-        #region Cache Support
-
-        public T CacheDeal<T>(Func<string> func)
-        {
-            return default(T);
-        }
-
-        #endregion
-
-
-        #region Query
+        #region Query Method -- Exist/Count/Entity/Entities/EntitiesPaging
 
         /// <summary>
         /// Exist
@@ -517,21 +507,6 @@ namespace QX_Frame.Helper_DG.Bantina
 
             string tableName = GetTablaName(typeof(TEntity));
 
-            string cacheKey = string.Concat(tableName, lambdaString).GetHashCode().ToString();
-
-            /**
-             * 如何判断缓存失效，即对当前表的增删改：
-             * 再加一个缓存，key为操作的表名，过期时间为默认，值随意  = 1 
-             * 每次取缓存，先判断表名缓存是否不为空，如果不为空，则是刚才对其进行了操作
-             * 如果为空，则直接取现在需要的缓存数据或者从数据库中获取，即使修改完过期变为空，那么 当前数据缓存也已经过期，并不会影响到数据的正确性
-             * */
-
-            object cacheValue = Cache_Helper_DG.Cache_Get(cacheKey);
-            if (cacheValue != null)
-            {
-                return Convert.ToInt32(cacheValue) > 0;
-            }
-
             StringBuilder builder = new StringBuilder();
 
             builder.Append("SELECT COUNT(0) FROM ");
@@ -542,9 +517,13 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
-            object result = ExecuteNonQuery(sql);
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
 
-            Cache_Helper_DG.Cache_Add(cacheKey, result);
+            object result = CacheChannel(tableName, cacheKey, () =>
+           {
+               return ExecuteScalar(sql);
+           });
 
             return result.ToInt() > 0;
         }
@@ -561,7 +540,15 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = "SELECT COUNT(0) FROM " + tableName;
 
-            return ExecuteScalar(sql).ToInt();
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return ExecuteScalar(sql);
+            });
+
+            return result.ToInt();
         }
 
         /// <summary>
@@ -587,7 +574,15 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
-            return ExecuteScalar(sql).ToInt();
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return ExecuteScalar(sql);
+            });
+
+            return result.ToInt();
         }
 
         /// <summary>
@@ -612,7 +607,15 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
-            return Return_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return Return_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            });
+
+            return result as TEntity;
         }
 
         /// <summary>
@@ -627,7 +630,15 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = "SELECT * FROM " + tableName;
 
-            return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            });
+
+            return result as List<TEntity>;
         }
 
         /// <summary>
@@ -652,7 +663,15 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
-            return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            });
+
+            return result as List<TEntity>;
         }
 
         /// <summary>
@@ -695,7 +714,15 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
-            return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            });
+
+            return result as List<TEntity>;
         }
 
         /// <summary>
@@ -743,7 +770,15 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
-            return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            });
+
+            return result as List<TEntity>;
         }
 
         /// <summary>
@@ -789,7 +824,15 @@ namespace QX_Frame.Helper_DG.Bantina
 
             count = QueryCount<TEntity>();
 
-            return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            });
+
+            return result as List<TEntity>;
         }
 
         /// <summary>
@@ -841,8 +884,71 @@ namespace QX_Frame.Helper_DG.Bantina
             //Get Data Count
             count = QueryCount(where);
 
-            return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            //Cache Support
+            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+            });
+
+            return result as List<TEntity>;
         }
+        #endregion
+
+        #region prepare
+
+        /// <summary>
+        /// Get Table Name by Attribute
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private string GetTablaName(Type type)
+        {
+            object[] objs = type.GetCustomAttributes(typeof(TableAttribute), true);
+            if (objs.FirstOrDefault() is TableAttribute attr)
+                return !string.IsNullOrEmpty(attr.TableName) == true ? attr.TableName : type.Name;
+            return type.Name;
+        }
+        #endregion
+
+        #region Cache Support
+
+        /// <summary>
+        /// Cache Channel
+        /// </summary>
+        /// <param name="tableName">tableName</param>
+        /// <param name="cacheKey">cacheKey</param>
+        /// <param name="func">Func<object></param>
+        /// <returns></returns>
+        private object CacheChannel(string tableName, string cacheKey, Func<object> func)
+        {
+            /**
+             * author:qixiao
+             * create:2017-8-7 22:47:13
+             * Howw to judge a cache lose efficacy when we update the table data ？
+             * we add another cache name changeCache， let key = tableName，expire time default ，like 1.
+             * once we gain data from cache ， validate changeCache has any value not null.if it is ,regard value changed,we should gain table data renew not from cache.
+             * if it is null , regard as unchanged, if cacheCache expire ,dataCache expired too,we can gain cache relieved
+             * */
+            if (HttpRuntimeCache_Helper_DG.Cache_Get(tableName) == null)
+            {
+                object cacheValue = HttpRuntimeCache_Helper_DG.Cache_Get(cacheKey);
+                if (cacheValue != null)
+                {
+                    return cacheValue;
+                }
+            }
+
+            //Execute Action
+            object result = func();
+
+            HttpRuntimeCache_Helper_DG.Cache_Add(cacheKey, result);
+            HttpRuntimeCache_Helper_DG.Cache_Delete(tableName);
+
+            return result;
+        }
+
         #endregion
 
         /// <summary>

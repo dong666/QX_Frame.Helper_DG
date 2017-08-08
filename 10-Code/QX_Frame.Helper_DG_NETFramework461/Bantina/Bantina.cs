@@ -1,12 +1,15 @@
 ﻿using QX_Frame.Helper_DG.Extends;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 /**
  * author:qixiao
@@ -21,10 +24,10 @@ namespace QX_Frame.Helper_DG.Bantina
     {
         Task<bool> Add<TEntity>(TEntity entity) where TEntity : class;
         Task<bool> Update<TEntity>(TEntity entity) where TEntity : class;
+        Task<bool> Update<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> where) where TEntity : class;
         Task<bool> Delete<TEntity>(TEntity entity) where TEntity : class;
         Task<bool> Delete<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class;
-        Task<bool> Update<TEntity>(TEntity entity, Expression<Func<TEntity, bool>> where) where TEntity : class;
-        bool Exist<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class;
+        bool QueryExist<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class;
         int QueryCount<TEntity>() where TEntity : class;
         int QueryCount<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class;
         TEntity QueryEntity<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class;
@@ -34,12 +37,19 @@ namespace QX_Frame.Helper_DG.Bantina
         List<TEntity> QueryEntitiesPaging<TEntity, TKey>(int pageIndex, int pageSize, Expression<Func<TEntity, TKey>> orderBy, Expression<Func<TEntity, bool>> where, bool isDESC = false) where TEntity : class;
         List<TEntity> QueryEntitiesPaging<TEntity, TKey>(int pageIndex, int pageSize, Expression<Func<TEntity, TKey>> orderBy, out int count, bool isDESC = false) where TEntity : class;
         List<TEntity> QueryEntitiesPaging<TEntity, TKey>(int pageIndex, int pageSize, Expression<Func<TEntity, TKey>> orderBy, Expression<Func<TEntity, bool>> where, out int count, bool isDESC = false) where TEntity : class;
+        int ExecuteSql(string sql, params SqlParameter[] parms);
+        List<TEntity> ExecuteSqlToList<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class;
+        int ExecuteStoredProcedure(string storedProcedureName, params object[] parms);
+        List<TEntity> ExecuteStoredProcedureToList<TEntity>(string storedProcedureName, params object[] parms) where TEntity : class;
     }
 
     public abstract class Bantina : Sql_Helper_DG, IDisposable, IBantina
     {
         #region Constructor
 
+        /// <summary>
+        /// Bantina
+        /// </summary>
         public Bantina()
         {
             if (string.IsNullOrEmpty(ConnString_Default))
@@ -49,8 +59,17 @@ namespace QX_Frame.Helper_DG.Bantina
 
         }
 
+        /// <summary>
+        /// Bantina
+        /// </summary>
+        /// <param name="connString"></param>
         public Bantina(string connString) => ConnString_Default = connString;
 
+        /// <summary>
+        /// Bantina
+        /// </summary>
+        /// <param name="connString_RW"></param>
+        /// <param name="connString_R"></param>
         public Bantina(string connString_RW, string connString_R)
         {
             ConnString_RW = connString_RW;
@@ -61,6 +80,12 @@ namespace QX_Frame.Helper_DG.Bantina
 
         #region Add Method
 
+        /// <summary>
+        /// Add
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public async Task<bool> Add<TEntity>(TEntity entity) where TEntity : class
         {
             Type entityType = typeof(TEntity);
@@ -114,6 +139,17 @@ namespace QX_Frame.Helper_DG.Bantina
 
                         sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                     }
+                }
+                else
+                {
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append(",");
+
+                    builder_behind.Append("@");
+                    builder_behind.Append(propertyInfo.Name);
+                    builder_behind.Append(",");
+
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                 }
 
                 if (propertyInfos.Last() == propertyInfo)
@@ -196,6 +232,7 @@ namespace QX_Frame.Helper_DG.Bantina
                         sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                     }
                     keyCount++;
+                    continue;
                 }
 
                 //AutoIncrease : if property is auto increase attribute skip this column.
@@ -227,6 +264,16 @@ namespace QX_Frame.Helper_DG.Bantina
 
                         sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                     }
+                }
+                else
+                {
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append("=");
+                    builder_front.Append("@");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append(",");
+
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                 }
 
                 if (propertyInfos.Last() == propertyInfo)
@@ -343,6 +390,16 @@ namespace QX_Frame.Helper_DG.Bantina
                         sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                     }
                 }
+                else
+                {
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append("=");
+                    builder_front.Append("@");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append(",");
+
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
+                }
 
                 if (propertyInfos.Last() == propertyInfo)
                 {
@@ -422,6 +479,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
                         sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                     }
+                    keyCount++;
                 }
             }
 
@@ -493,15 +551,15 @@ namespace QX_Frame.Helper_DG.Bantina
 
         #endregion
 
-        #region Query Method -- Exist/Count/Entity/Entities/EntitiesPaging
+        #region Query Method -- QueryExist/Count/Entity/Entities/EntitiesPaging
 
         /// <summary>
-        /// Exist
+        /// QueryExist
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="where"></param>
         /// <returns></returns>
-        public bool Exist<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class
+        public bool QueryExist<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class
         {
             string lambdaString = where.ToString();
 
@@ -612,7 +670,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
-                return Return_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+                return ExecuteDataSetTo_TEntity<TEntity>(ExecuteDataSet(sql));
             });
 
             return result as TEntity;
@@ -635,7 +693,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
-                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+                return ExecuteDataSetToList_TEntity<TEntity>(ExecuteDataSet(sql));
             });
 
             return result as List<TEntity>;
@@ -668,7 +726,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
-                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+                return ExecuteDataSetToList_TEntity<TEntity>(ExecuteDataSet(sql));
             });
 
             return result as List<TEntity>;
@@ -719,7 +777,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
-                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+                return ExecuteDataSetToList_TEntity<TEntity>(ExecuteDataSet(sql));
             });
 
             return result as List<TEntity>;
@@ -775,7 +833,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
-                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+                return ExecuteDataSetToList_TEntity<TEntity>(ExecuteDataSet(sql));
             });
 
             return result as List<TEntity>;
@@ -829,7 +887,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
-                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+                return ExecuteDataSetToList_TEntity<TEntity>(ExecuteDataSet(sql));
             });
 
             return result as List<TEntity>;
@@ -889,27 +947,78 @@ namespace QX_Frame.Helper_DG.Bantina
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
-                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql));
+                return ExecuteDataSetToList_TEntity<TEntity>(ExecuteDataSet(sql));
             });
 
             return result as List<TEntity>;
         }
         #endregion
 
-        #region prepare
+        #region Execute Method
 
         /// <summary>
-        /// Get Table Name by Attribute
+        /// ExecuteSql
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="sql"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
-        private string GetTablaName(Type type)
+        public int ExecuteSql(string sql, params SqlParameter[] parms)
         {
-            object[] objs = type.GetCustomAttributes(typeof(TableAttribute), true);
-            if (objs.FirstOrDefault() is TableAttribute attr)
-                return !string.IsNullOrEmpty(attr.TableName) == true ? attr.TableName : type.Name;
-            return type.Name;
+            string cacheKey = sql.GetHashCode().ToString();
+            object result = CacheChannel("Query_" + cacheKey, cacheKey, () =>
+              {
+                  return ExecuteNonQuery(sql, CommandType.Text, parms);
+              });
+            return result.ToInt();
         }
+        /// <summary>
+        /// ExecuteList
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        public List<TEntity> ExecuteSqlToList<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
+        {
+            string cacheKey = sql.GetHashCode().ToString();
+            object result = CacheChannel("Query_" + cacheKey, cacheKey, () =>
+            {
+                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql, CommandType.Text, parms)); ;
+            });
+            return result as List<TEntity>;
+        }
+        /// <summary>
+        /// ExecuteStoredProcedure
+        /// </summary>
+        /// <param name="storedProcedureName"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        public int ExecuteStoredProcedure(string storedProcedureName, params object[] parms)
+        {
+            string cacheKey = storedProcedureName.GetHashCode().ToString();
+            object result = CacheChannel("storedProcedureName_" + cacheKey, cacheKey, () =>
+            {
+                return ExecuteNonQuery(storedProcedureName, CommandType.StoredProcedure, parms);
+            });
+            return result.ToInt();
+        }
+        /// <summary>
+        /// ExecuteStoredProcedureToList
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="storedProcedureName"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        public List<TEntity> ExecuteStoredProcedureToList<TEntity>(string storedProcedureName, params object[] parms) where TEntity : class
+        {
+            string cacheKey = storedProcedureName.GetHashCode().ToString();
+            object result = CacheChannel("storedProcedureName_" + cacheKey, cacheKey, () =>
+            {
+                return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(storedProcedureName, CommandType.StoredProcedure, parms)); ;
+            });
+            return result as List<TEntity>;
+        }
+
         #endregion
 
         #region Cache Support
@@ -951,9 +1060,148 @@ namespace QX_Frame.Helper_DG.Bantina
 
         #endregion
 
+        #region Transaction Support
+        /// <summary>
+        /// Transacation
+        /// </summary>
+        /// <param name="action"></param>
+        public static void Transaction(Action action)
+        {
+            using (TransactionScope trans = new TransactionScope())
+            {
+                action();
+                trans.Complete();
+            }
+        }
+        #endregion
+
+        #region prepare
+
+        /// <summary>
+        /// Get Table Name by Attribute
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private string GetTablaName(Type type)
+        {
+            object[] objs = type.GetCustomAttributes(typeof(TableAttribute), true);
+            if (objs.FirstOrDefault() is TableAttribute attr)
+                return !string.IsNullOrEmpty(attr.TableName) == true ? attr.TableName : type.Name;
+            return type.Name;
+        }
+
+        /// <summary>
+        /// ExecuteDataSetTo_TEntity
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="ds"></param>
+        /// <returns></returns>
+        private TEntity ExecuteDataSetTo_TEntity<TEntity>(DataSet ds) where TEntity : class => ExecuteDataSetToList_TEntity<TEntity>(ds).FirstOrDefault();
+
+        /// <summary>
+        /// ExecuteDataSetToList_TEntity
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="ds"></param>
+        /// <returns></returns>
+        private List<TEntity> ExecuteDataSetToList_TEntity<TEntity>(DataSet ds) where TEntity : class
+        {
+            try
+            {
+                List<TEntity> list = new List<TEntity>();//instantiate a list object
+                PropertyInfo[] propertyInfos = typeof(TEntity).GetProperties();     //获取T对象的所有公共属性
+
+                DataTable dt = ds.Tables[0];    // 获取到ds的dt
+                if (dt.Rows.Count > 0)
+                {
+                    //判断读取的行是否>0 即数据库数据已被读取
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        TEntity model = System.Activator.CreateInstance<TEntity>();//实例化一个对象，便于往list里填充数据
+                        foreach (PropertyInfo propertyInfo in propertyInfos)
+                        {
+                            if (propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) is KeyAttribute keyAttr)
+                            {
+                                if (!string.IsNullOrEmpty(keyAttr.ColumnName))
+                                {
+                                    model = SetValueToTEntityFromRows(model, propertyInfo, row, keyAttr.ColumnName);
+                                }
+                                else
+                                {
+                                    model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
+                                }
+                                continue;
+                            }
+
+                            if (propertyInfo.GetCustomAttribute(typeof(ColumnAttribute), true) is ColumnAttribute columnAttr)
+                            {
+                                if (!string.IsNullOrEmpty(columnAttr.ColumnName))
+                                {
+                                    model = SetValueToTEntityFromRows(model, propertyInfo, row, columnAttr.ColumnName);
+                                }
+                                else
+                                {
+                                    model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
+                                }
+                            }
+                            else
+                            {
+                                model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
+                            }
+                        }
+                        list.Add(model);
+                    }
+                }
+                return list;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// SetValueToTEntityFromRows
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="propertyInfo"></param>
+        /// <param name="row"></param>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
+        private TEntity SetValueToTEntityFromRows<TEntity>(TEntity entity, PropertyInfo propertyInfo, DataRow row, string columnName)
+        {
+            if (row[columnName] != System.DBNull.Value)
+            {
+                //判断值是否为空，如果空赋值为null见else
+                if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                {
+                    //如果convertsionType为nullable类，声明一个NullableConverter类，该类提供从Nullable类到基础基元类型的转换
+                    NullableConverter nullableConverter = new NullableConverter(propertyInfo.PropertyType);
+                    //将convertsionType转换为nullable对的基础基元类型
+                    propertyInfo.SetValue(entity, Convert.ChangeType(row[columnName], nullableConverter.UnderlyingType), null);
+                }
+                else
+                {
+                    propertyInfo.SetValue(entity, Convert.ChangeType(row[columnName], propertyInfo.PropertyType), null);
+                }
+            }
+            else
+            {
+                propertyInfo.SetValue(entity, null, null);//如果数据库的值为空，则赋值为null
+            }
+            return entity;
+        }
+
+        #endregion
+
+        #region Dispose
+
         /// <summary>
         /// Dispose
         /// </summary>
         public void Dispose() => GC.Collect();
+
+        #endregion
     }
 }

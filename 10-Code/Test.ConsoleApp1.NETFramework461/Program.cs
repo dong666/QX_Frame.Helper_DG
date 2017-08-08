@@ -37,17 +37,22 @@ namespace Test.ConsoleApp1.NETFramework461
             //Console.WriteLine(people2.GetHashCode());
 
 
-
             using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
             {
+                test.ExecuteSql("");
                 //List<TB_People> peopleList = test.QueryEntitiesPaging<TB_People, string>(1, 5, t => t.Name, t => t.Name.StartsWith("li"), out int count, true);
-                //foreach (var item in peopleList)
-                //{
-                //    Console.WriteLine(item.Uid + " " + item.Name);
-                //}
+                List<TB_People> peopleList = test.QueryEntities<TB_People>();
+                foreach (var item in peopleList)
+                {
+                    Console.WriteLine(item.Uid + " " + item.Name_DD+" "+item.Age);
+                }
+                Console.WriteLine("-----------------");
+                List<TB_People> peopleList3 = test.QueryEntities<TB_People>();
+                foreach (var item in peopleList3)
+                {
+                    Console.WriteLine(item.Uid + " " + item.Name_DD + " " + item.Age);
+                }
                 //Console.WriteLine(count);
-                Console.WriteLine(test.Exist<TB_People>(t=>t.Name.Equals("3")));
-                Console.WriteLine(test.Exist<TB_People>(t=>t.Name.Equals("3")));
             }
 
 
@@ -72,11 +77,9 @@ namespace Test.ConsoleApp1.NETFramework461
     {
         [KeyAttribute]
         public Guid Uid { get; set; }
-        [Column]
-        public string Name { get; set; }
-        [Column]
+        [Column(ColumnName ="Name")]
+        public string Name_DD { get; set; }
         public int Age { get; set; }
-        [Column]
         public int ClassId { get; set; }
 
     }

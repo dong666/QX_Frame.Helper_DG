@@ -587,8 +587,7 @@ namespace QX_Frame.Helper_DG
             try
             {
                 List<T> list = new List<T>();//实例化一个list对象
-                T model = System.Activator.CreateInstance<T>();                     //实例化一个T类型对象
-                PropertyInfo[] propertyInfos = model.GetType().GetProperties();     //获取T对象的所有公共属性
+                PropertyInfo[] propertyInfos = typeof(T).GetProperties();     //获取T对象的所有公共属性
 
                 DataTable dt = ds.Tables[0];    // 获取到ds的dt
                 if (dt.Rows.Count > 0)

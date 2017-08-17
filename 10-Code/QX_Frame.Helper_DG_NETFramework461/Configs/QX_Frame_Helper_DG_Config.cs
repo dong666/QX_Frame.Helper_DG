@@ -23,6 +23,8 @@ namespace QX_Frame.Helper_DG.Configs
 
         #region log
 
+        public static Opt_LogType LogType { get; set; } = Opt_LogType.LocalFile;
+
         public static string Log_Location_General { get; set; } = @"Log_QX_Frame/Log_QX_Frame_General/";
         public static string Log_Location_Error { get; set; } = @"Log_QX_Frame/Log_QX_Frame_Error/";
         public static string Log_Location_Use { get; set; } = @"Log_QX_Frame/Log_QX_Frame_Use/";

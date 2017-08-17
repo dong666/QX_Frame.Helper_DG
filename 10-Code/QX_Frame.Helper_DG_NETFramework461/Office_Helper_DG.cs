@@ -690,7 +690,6 @@ namespace QX_Frame.Helper_DG
         /// <returns></returns>
         public static DataTable ImportExceltoDt(string strFileName, string SheetName, int HeaderRowIndex)
         {
-            HSSFWorkbook workbook;
             IWorkbook wb;
             using (FileStream file = new FileStream(strFileName, FileMode.Open, FileAccess.Read))
             {
@@ -700,7 +699,6 @@ namespace QX_Frame.Helper_DG
             DataTable table = new DataTable();
             table = ImportDt(sheet, HeaderRowIndex, true);
             //ExcelFileStream.Close();
-            workbook = null;
             sheet = null;
             return table;
         }
@@ -744,7 +742,6 @@ namespace QX_Frame.Helper_DG
         /// <returns></returns>
         public static DataTable ImportExceltoDt(string strFileName, string SheetName, int HeaderRowIndex, bool needHeader)
         {
-            HSSFWorkbook workbook;
             IWorkbook wb;
             using (FileStream file = new FileStream(strFileName, FileMode.Open, FileAccess.Read))
             {
@@ -754,7 +751,6 @@ namespace QX_Frame.Helper_DG
             DataTable table = new DataTable();
             table = ImportDt(sheet, 1, needHeader);
             //ExcelFileStream.Close();
-            workbook = null;
             sheet = null;
             return table;
         }
@@ -769,7 +765,6 @@ namespace QX_Frame.Helper_DG
         public static DataTable ImportExceltoDt(string strFileName, int SheetIndex, int HeaderRowIndex, bool needHeader)
         {
 
-            HSSFWorkbook workbook;
             IWorkbook wb;
             using (FileStream file = new FileStream(strFileName, FileMode.Open, FileAccess.Read))
             {
@@ -779,7 +774,6 @@ namespace QX_Frame.Helper_DG
             DataTable table = new DataTable();
             table = ImportDt(sheet, HeaderRowIndex, needHeader);      //!!!!!!!!
             //ExcelFileStream.Close();
-            workbook = null;
             sheet = null;
             return table;
         }

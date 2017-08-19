@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using QX_Frame.Helper_DG.Extends;
 using System;
 using System.Configuration;
 using System.IO;
@@ -12,6 +11,10 @@ using System.Text;
  * */
 namespace QX_Frame.Helper_DG
 {
+    /// <summary>
+    /// the File_Helper_DG adjust to IO_Helper_DG
+    /// </summary>
+    [Obsolete("the File_Helper_DG adjust to IO_Helper_DG ,recommend to use IO_Helper_DGs")]
     public class File_Helper_DG
     {
         #region Txt File Opreation

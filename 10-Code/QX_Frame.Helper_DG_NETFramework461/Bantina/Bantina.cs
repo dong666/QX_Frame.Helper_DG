@@ -37,9 +37,11 @@ namespace QX_Frame.Helper_DG.Bantina
         List<TEntity> QueryEntitiesPaging<TEntity, TKey>(int pageIndex, int pageSize, Expression<Func<TEntity, TKey>> orderBy, Expression<Func<TEntity, bool>> where, bool isDESC = false) where TEntity : class;
         List<TEntity> QueryEntitiesPaging<TEntity, TKey>(int pageIndex, int pageSize, Expression<Func<TEntity, TKey>> orderBy, out int count, bool isDESC = false) where TEntity : class;
         List<TEntity> QueryEntitiesPaging<TEntity, TKey>(int pageIndex, int pageSize, Expression<Func<TEntity, TKey>> orderBy, Expression<Func<TEntity, bool>> where, out int count, bool isDESC = false) where TEntity : class;
-        int ExecuteSql(string sql, params SqlParameter[] parms);
+        DataTable QueryDataTable<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class;
+        DataSet QueryDataDataSet<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class;
+        int ExecuteSql<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class;
         List<TEntity> ExecuteSqlToList<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class;
-        int ExecuteStoredProcedure(string storedProcedureName, params object[] parms);
+        int ExecuteStoredProcedure<TEntity>(string storedProcedureName, params object[] parms) where TEntity : class;
         List<TEntity> ExecuteStoredProcedureToList<TEntity>(string storedProcedureName, params object[] parms) where TEntity : class;
     }
 
@@ -56,7 +58,6 @@ namespace QX_Frame.Helper_DG.Bantina
             {
                 throw new Exception_DG("ConnString_Default Must Be Declared When Initiation ! -- QX_Frame.Helper_DG.Bantina");
             }
-
         }
 
         /// <summary>
@@ -140,17 +141,20 @@ namespace QX_Frame.Helper_DG.Bantina
                         sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                     }
                 }
-                else
-                {
-                    builder_front.Append(propertyInfo.Name);
-                    builder_front.Append(",");
+                /**
+                 * if property dosenot have ColumnAttribute or Key Attribute cannot be scan
+                 **/
+                //else
+                //{
+                //    builder_front.Append(propertyInfo.Name);
+                //    builder_front.Append(",");
 
-                    builder_behind.Append("@");
-                    builder_behind.Append(propertyInfo.Name);
-                    builder_behind.Append(",");
+                //    builder_behind.Append("@");
+                //    builder_behind.Append(propertyInfo.Name);
+                //    builder_behind.Append(",");
 
-                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                }
+                //    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
+                //}
 
                 if (propertyInfos.Last() == propertyInfo)
                 {
@@ -265,16 +269,19 @@ namespace QX_Frame.Helper_DG.Bantina
                         sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                     }
                 }
-                else
-                {
-                    builder_front.Append(propertyInfo.Name);
-                    builder_front.Append("=");
-                    builder_front.Append("@");
-                    builder_front.Append(propertyInfo.Name);
-                    builder_front.Append(",");
+                /**
+                * if property dosenot have ColumnAttribute or Key Attribute cannot be scan
+                **/
+                //else
+                //{
+                //    builder_front.Append(propertyInfo.Name);
+                //    builder_front.Append("=");
+                //    builder_front.Append("@");
+                //    builder_front.Append(propertyInfo.Name);
+                //    builder_front.Append(",");
 
-                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                }
+                //    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
+                //}
 
                 if (propertyInfos.Last() == propertyInfo)
                 {
@@ -390,16 +397,19 @@ namespace QX_Frame.Helper_DG.Bantina
                         sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                     }
                 }
-                else
-                {
-                    builder_front.Append(propertyInfo.Name);
-                    builder_front.Append("=");
-                    builder_front.Append("@");
-                    builder_front.Append(propertyInfo.Name);
-                    builder_front.Append(",");
+                /**
+                * if property dosenot have ColumnAttribute or Key Attribute cannot be scan
+                **/
+                //else
+                //{
+                //    builder_front.Append(propertyInfo.Name);
+                //    builder_front.Append("=");
+                //    builder_front.Append("@");
+                //    builder_front.Append(propertyInfo.Name);
+                //    builder_front.Append(",");
 
-                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                }
+                //    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
+                //}
 
                 if (propertyInfos.Last() == propertyInfo)
                 {
@@ -551,7 +561,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
         #endregion
 
-        #region Query Method -- QueryExist/Count/Entity/Entities/EntitiesPaging
+        #region Query Method -- QueryExist/Count/Entity/Entities/EntitiesPaging/DataTable
 
         /// <summary>
         /// QueryExist
@@ -576,7 +586,7 @@ namespace QX_Frame.Helper_DG.Bantina
             string sql = builder.ToString();
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryExist_bool", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
            {
@@ -599,7 +609,7 @@ namespace QX_Frame.Helper_DG.Bantina
             string sql = "SELECT COUNT(0) FROM " + tableName;
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryCount_int", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -633,7 +643,7 @@ namespace QX_Frame.Helper_DG.Bantina
             string sql = builder.ToString();
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryCount_int", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -666,7 +676,7 @@ namespace QX_Frame.Helper_DG.Bantina
             string sql = builder.ToString();
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryEntity_TEntity", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -689,7 +699,7 @@ namespace QX_Frame.Helper_DG.Bantina
             string sql = "SELECT * FROM " + tableName;
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryEntities_List<TEntity>", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -722,7 +732,7 @@ namespace QX_Frame.Helper_DG.Bantina
             string sql = builder.ToString();
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryEntities_List<TEntity>", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -773,7 +783,7 @@ namespace QX_Frame.Helper_DG.Bantina
             string sql = builder.ToString();
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryEntitiesPaging_List<TEntity>", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -829,7 +839,7 @@ namespace QX_Frame.Helper_DG.Bantina
             string sql = builder.ToString();
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryEntitiesPaging_List<TEntity>", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -883,7 +893,7 @@ namespace QX_Frame.Helper_DG.Bantina
             count = QueryCount<TEntity>();
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryEntitiesPaging_List<TEntity>", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -943,7 +953,7 @@ namespace QX_Frame.Helper_DG.Bantina
             count = QueryCount(where);
 
             //Cache Support
-            string cacheKey = string.Concat(tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("QueryEntitiesPaging_List<TEntity>", tableName, sql).GetHashCode().ToString();
 
             object result = CacheChannel(tableName, cacheKey, () =>
             {
@@ -952,6 +962,94 @@ namespace QX_Frame.Helper_DG.Bantina
 
             return result as List<TEntity>;
         }
+
+        /// <summary>
+        /// QueryDataTable<TEntity>
+        /// </summary>
+        /// <typeparam name="TEntity">TEntity</typeparam>
+        /// <param name="where">where</param>
+        /// <returns></returns>
+        public DataTable QueryDataTable<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class
+        {
+            string lambdaString = where.ToString();
+
+            string tableName = GetTablaName(typeof(TEntity));
+
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append("SELECT * FROM ");
+            builder.Append(tableName);
+            builder.Append(" ");
+            builder.Append(lambdaString.LambdaToSqlStatement());
+
+            //Generate SqlStatement
+            string sql = builder.ToString();
+
+            //Cache Support
+            string cacheKey = string.Concat("QueryDataTable_DataTable", tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return ExecuteDataTable(sql);
+            });
+            return result as DataTable;
+        }
+
+        public DataTable QueryDataTable<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
+        {
+            string tableName = GetTablaName(typeof(TEntity));
+            string cacheKey = string.Concat("QueryDataTable_DataTable", tableName, sql).GetHashCode().ToString();
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return ExecuteDataTable(sql, CommandType.Text, parms);
+            });
+            return result as DataTable;
+        }
+
+        /// <summary>
+        /// QueryDataSet<TEntity>
+        /// </summary>
+        /// <typeparam name="TEntity">TEntity</typeparam>
+        /// <param name="where">where</param>
+        /// <returns></returns>
+        public DataSet QueryDataDataSet<TEntity>(Expression<Func<TEntity, bool>> where) where TEntity : class
+        {
+            string lambdaString = where.ToString();
+
+            string tableName = GetTablaName(typeof(TEntity));
+
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append("SELECT * FROM ");
+            builder.Append(tableName);
+            builder.Append(" ");
+            builder.Append(lambdaString.LambdaToSqlStatement());
+
+            //Generate SqlStatement
+            string sql = builder.ToString();
+
+            //Cache Support
+            string cacheKey = string.Concat("QueryDataDataSet_DataSet", tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return ExecuteDataSet(sql);
+            });
+
+            return result as DataSet;
+        }
+
+        public DataSet QueryDataDataSet<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
+        {
+            string tableName = GetTablaName(typeof(TEntity));
+            string cacheKey = string.Concat("QueryDataDataSet_DataSet", tableName, sql).GetHashCode().ToString();
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return ExecuteDataSet(sql, CommandType.Text, parms);
+            });
+            return result as DataSet;
+        }
+
         #endregion
 
         #region Execute Method
@@ -962,15 +1060,19 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <param name="sql"></param>
         /// <param name="parms"></param>
         /// <returns></returns>
-        public int ExecuteSql(string sql, params SqlParameter[] parms)
+        public int ExecuteSql<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
         {
-            string cacheKey = sql.GetHashCode().ToString();
-            object result = CacheChannel("Query_" + cacheKey, cacheKey, () =>
+            string tableName = GetTablaName(typeof(TEntity));
+            string cacheKey = string.Concat("ExecuteSqlToList_int", tableName, sql).GetHashCode().ToString();
+            object result = CacheChannel(tableName, cacheKey, () =>
               {
                   return ExecuteNonQuery(sql, CommandType.Text, parms);
               });
+            // Cache Deal:if Table change,we should renew the cache value
+            HttpRuntimeCache_Helper_DG.Cache_Add(tableName, result);
             return result.ToInt();
         }
+
         /// <summary>
         /// ExecuteList
         /// </summary>
@@ -980,28 +1082,34 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <returns></returns>
         public List<TEntity> ExecuteSqlToList<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
         {
-            string cacheKey = sql.GetHashCode().ToString();
-            object result = CacheChannel("Query_" + cacheKey, cacheKey, () =>
+            string tableName = GetTablaName(typeof(TEntity));
+            string cacheKey = string.Concat("ExecuteSqlToList_List<TEntity>", tableName, sql).GetHashCode().ToString();
+            object result = CacheChannel(tableName + cacheKey, cacheKey, () =>
             {
                 return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(sql, CommandType.Text, parms)); ;
             });
             return result as List<TEntity>;
         }
+
         /// <summary>
         /// ExecuteStoredProcedure
         /// </summary>
         /// <param name="storedProcedureName"></param>
         /// <param name="parms"></param>
         /// <returns></returns>
-        public int ExecuteStoredProcedure(string storedProcedureName, params object[] parms)
+        public int ExecuteStoredProcedure<TEntity>(string storedProcedureName, params object[] parms) where TEntity : class
         {
-            string cacheKey = storedProcedureName.GetHashCode().ToString();
-            object result = CacheChannel("storedProcedureName_" + cacheKey, cacheKey, () =>
+            string tableName = GetTablaName(typeof(TEntity));
+            string cacheKey = string.Concat("ExecuteStoredProcedure_int", tableName, storedProcedureName).GetHashCode().ToString();
+            object result = CacheChannel(tableName, cacheKey, () =>
             {
                 return ExecuteNonQuery(storedProcedureName, CommandType.StoredProcedure, parms);
             });
+            // Cache Deal:if Table change,we should renew the cache value
+            HttpRuntimeCache_Helper_DG.Cache_Add(tableName, result);
             return result.ToInt();
         }
+
         /// <summary>
         /// ExecuteStoredProcedureToList
         /// </summary>
@@ -1011,8 +1119,9 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <returns></returns>
         public List<TEntity> ExecuteStoredProcedureToList<TEntity>(string storedProcedureName, params object[] parms) where TEntity : class
         {
-            string cacheKey = storedProcedureName.GetHashCode().ToString();
-            object result = CacheChannel("storedProcedureName_" + cacheKey, cacheKey, () =>
+            string tableName = GetTablaName(typeof(TEntity));
+            string cacheKey = string.Concat("ExecuteStoredProcedureToList_List<TEntity>", tableName, storedProcedureName).GetHashCode().ToString();
+            object result = CacheChannel(tableName, cacheKey, () =>
             {
                 return Return_List_T_ByDataSet<TEntity>(ExecuteDataSet(storedProcedureName, CommandType.StoredProcedure, parms)); ;
             });
@@ -1144,10 +1253,13 @@ namespace QX_Frame.Helper_DG.Bantina
                                     model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
                                 }
                             }
-                            else
-                            {
-                                model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
-                            }
+                            /**
+                             * if property dosenot have ColumnAttribute or Key Attribute cannot be scan
+                             */
+                            //else
+                            //{
+                            //    model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
+                            //}
                         }
                         list.Add(model);
                     }

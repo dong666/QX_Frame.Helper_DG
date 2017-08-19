@@ -14,6 +14,7 @@ using ServiceStack.Redis;
 using System.Linq.Expressions;
 using System.Reflection;
 using QX_Frame.Helper_DG.Bantina;
+using System.Data;
 
 namespace Test.ConsoleApp1.NETFramework461
 {
@@ -39,12 +40,12 @@ namespace Test.ConsoleApp1.NETFramework461
 
             using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
             {
-                test.ExecuteSql("");
+                test.ExecuteSql<TB_People>("");
                 //List<TB_People> peopleList = test.QueryEntitiesPaging<TB_People, string>(1, 5, t => t.Name, t => t.Name.StartsWith("li"), out int count, true);
                 List<TB_People> peopleList = test.QueryEntities<TB_People>();
                 foreach (var item in peopleList)
                 {
-                    Console.WriteLine(item.Uid + " " + item.Name_DD+" "+item.Age);
+                    Console.WriteLine(item.Uid + " " + item.Name_DD + " " + item.Age);
                 }
                 Console.WriteLine("-----------------");
                 List<TB_People> peopleList3 = test.QueryEntities<TB_People>();
@@ -55,6 +56,9 @@ namespace Test.ConsoleApp1.NETFramework461
                 //Console.WriteLine(count);
             }
 
+
+
+            //DataTable table = Office_Helper_DG.ImportExceltoDt(filePath, 0,0);
 
 
 

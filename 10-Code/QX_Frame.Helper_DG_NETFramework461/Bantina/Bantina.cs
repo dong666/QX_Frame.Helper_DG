@@ -1,5 +1,18 @@
-﻿using QX_Frame.Helper_DG.Extends;
+﻿/*********************************************************
+ * CopyRight: QIXIAO CODE BUILDER. 
+ * Version:4.2.0
+ * Author:qixiao(柒小)
+ * Create:2017-8-7 10:46:07
+ * Update:2017-8-22 09:26:07
+ * E-mail: dong@qixiao.me | wd8622088@foxmail.com 
+ * Personal WebSit: http://qixiao.me 
+ * Technical WebSit: http://www.cnblogs.com/qixiaoyizhan/ 
+ * Description:-.
+ * Thx , Best Regards ~
+ *********************************************************/
+using QX_Frame.Helper_DG.Extends;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,10 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
 
-/**
- * author:qixiao
- * create:2017-8-7 10:46:07
- * */
+
 namespace QX_Frame.Helper_DG.Bantina
 {
     /// <summary>
@@ -48,7 +58,6 @@ namespace QX_Frame.Helper_DG.Bantina
     public abstract class Bantina : Sql_Helper_DG, IDisposable, IBantina
     {
         #region Constructor
-
         /// <summary>
         /// Bantina
         /// </summary>
@@ -113,49 +122,32 @@ namespace QX_Frame.Helper_DG.Bantina
                 }
 
                 //key :
-                //KeyAttribute keyAttr=propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) as KeyAttribute;
+                if (propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) is KeyAttribute keyAttr)
+                {
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append(",");
+
+                    builder_behind.Append("@");
+                    builder_behind.Append(propertyInfo.Name);
+                    builder_behind.Append(",");
+
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
+                }
 
                 //Column :
                 if (propertyInfo.GetCustomAttribute(typeof(ColumnAttribute), true) is ColumnAttribute columnAttr)
                 {
-                    if (!string.IsNullOrEmpty(columnAttr.ColumnName))
-                    {
-                        builder_front.Append(columnAttr.ColumnName);
-                        builder_front.Append(",");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append(",");
 
-                        builder_behind.Append("@");
-                        builder_behind.Append(columnAttr.ColumnName);
-                        builder_behind.Append(",");
+                    builder_behind.Append("@");
+                    builder_behind.Append(propertyInfo.Name);
+                    builder_behind.Append(",");
 
-                        sqlParameterList.Add(new SqlParameter("@" + columnAttr.ColumnName, propertyInfo.GetValue(entity)));
-                    }
-                    else
-                    {
-                        builder_front.Append(propertyInfo.Name);
-                        builder_front.Append(",");
-
-                        builder_behind.Append("@");
-                        builder_behind.Append(propertyInfo.Name);
-                        builder_behind.Append(",");
-
-                        sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                    }
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                 }
-                /**
-                 * if property dosenot have ColumnAttribute or Key Attribute cannot be scan
-                 **/
-                //else
-                //{
-                //    builder_front.Append(propertyInfo.Name);
-                //    builder_front.Append(",");
 
-                //    builder_behind.Append("@");
-                //    builder_behind.Append(propertyInfo.Name);
-                //    builder_behind.Append(",");
-
-                //    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                //}
-
+                //the end
                 if (propertyInfos.Last() == propertyInfo)
                 {
                     builder_front.Remove(builder_front.Length - 1, 1);
@@ -217,24 +209,13 @@ namespace QX_Frame.Helper_DG.Bantina
                 //key :
                 if (propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) is KeyAttribute keyAttr)
                 {
-                    if (!string.IsNullOrEmpty(keyAttr.ColumnName))
-                    {
-                        builder_where.Append(keyAttr.ColumnName);
-                        builder_where.Append("=");
-                        builder_where.Append("@");
-                        builder_where.Append(keyAttr.ColumnName);
+                    builder_where.Append(propertyInfo.Name);
+                    builder_where.Append("=");
+                    builder_where.Append("@");
+                    builder_where.Append(propertyInfo.Name);
 
-                        sqlParameterList.Add(new SqlParameter("@" + keyAttr.ColumnName, propertyInfo.GetValue(entity)));
-                    }
-                    else
-                    {
-                        builder_where.Append(propertyInfo.Name);
-                        builder_where.Append("=");
-                        builder_where.Append("@");
-                        builder_where.Append(propertyInfo.Name);
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
 
-                        sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                    }
                     keyCount++;
                     continue;
                 }
@@ -248,41 +229,16 @@ namespace QX_Frame.Helper_DG.Bantina
                 //Column :
                 if (propertyInfo.GetCustomAttribute(typeof(ColumnAttribute), true) is ColumnAttribute columnAttr)
                 {
-                    if (!string.IsNullOrEmpty(columnAttr.ColumnName))
-                    {
-                        builder_front.Append(columnAttr.ColumnName);
-                        builder_front.Append("=");
-                        builder_front.Append("@");
-                        builder_front.Append(columnAttr.ColumnName);
-                        builder_front.Append(",");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append("=");
+                    builder_front.Append("@");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append(",");
 
-                        sqlParameterList.Add(new SqlParameter("@" + columnAttr.ColumnName, propertyInfo.GetValue(entity)));
-                    }
-                    else
-                    {
-                        builder_front.Append(propertyInfo.Name);
-                        builder_front.Append("=");
-                        builder_front.Append("@");
-                        builder_front.Append(propertyInfo.Name);
-                        builder_front.Append(",");
-
-                        sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                    }
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                 }
-                /**
-                * if property dosenot have ColumnAttribute or Key Attribute cannot be scan
-                **/
-                //else
-                //{
-                //    builder_front.Append(propertyInfo.Name);
-                //    builder_front.Append("=");
-                //    builder_front.Append("@");
-                //    builder_front.Append(propertyInfo.Name);
-                //    builder_front.Append(",");
 
-                //    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                //}
-
+                //the end
                 if (propertyInfos.Last() == propertyInfo)
                 {
                     builder_front.Remove(builder_front.Length - 1, 1);
@@ -351,66 +307,28 @@ namespace QX_Frame.Helper_DG.Bantina
                 //key :
                 if (propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) is KeyAttribute keyAttr)
                 {
-                    if (!string.IsNullOrEmpty(keyAttr.ColumnName))
-                    {
-                        builder_front.Append(keyAttr.ColumnName);
-                        builder_front.Append("=");
-                        builder_front.Append("@");
-                        builder_front.Append(keyAttr.ColumnName);
-                        builder_front.Append(",");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append("=");
+                    builder_front.Append("@");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append(",");
 
-                        sqlParameterList.Add(new SqlParameter("@" + keyAttr.ColumnName, propertyInfo.GetValue(entity)));
-                    }
-                    else
-                    {
-                        builder_front.Append(propertyInfo.Name);
-                        builder_front.Append("=");
-                        builder_front.Append("@");
-                        builder_front.Append(propertyInfo.Name);
-                        builder_front.Append(",");
-
-                        sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                    }
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                 }
 
                 //Column :
                 if (propertyInfo.GetCustomAttribute(typeof(ColumnAttribute), true) is ColumnAttribute columnAttr)
                 {
-                    if (!string.IsNullOrEmpty(columnAttr.ColumnName))
-                    {
-                        builder_front.Append(columnAttr.ColumnName);
-                        builder_front.Append("=");
-                        builder_front.Append("@");
-                        builder_front.Append(columnAttr.ColumnName);
-                        builder_front.Append(",");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append("=");
+                    builder_front.Append("@");
+                    builder_front.Append(propertyInfo.Name);
+                    builder_front.Append(",");
 
-                        sqlParameterList.Add(new SqlParameter("@" + columnAttr.ColumnName, propertyInfo.GetValue(entity)));
-                    }
-                    else
-                    {
-                        builder_front.Append(propertyInfo.Name);
-                        builder_front.Append("=");
-                        builder_front.Append("@");
-                        builder_front.Append(propertyInfo.Name);
-                        builder_front.Append(",");
-
-                        sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                    }
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
                 }
-                /**
-                * if property dosenot have ColumnAttribute or Key Attribute cannot be scan
-                **/
-                //else
-                //{
-                //    builder_front.Append(propertyInfo.Name);
-                //    builder_front.Append("=");
-                //    builder_front.Append("@");
-                //    builder_front.Append(propertyInfo.Name);
-                //    builder_front.Append(",");
 
-                //    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                //}
-
+                //the end
                 if (propertyInfos.Last() == propertyInfo)
                 {
                     builder_front.Remove(builder_front.Length - 1, 1);
@@ -471,24 +389,13 @@ namespace QX_Frame.Helper_DG.Bantina
                 //key :
                 if (propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) is KeyAttribute keyAttr)
                 {
-                    if (!string.IsNullOrEmpty(keyAttr.ColumnName))
-                    {
-                        builder_where.Append(keyAttr.ColumnName);
-                        builder_where.Append("=");
-                        builder_where.Append("@");
-                        builder_where.Append(keyAttr.ColumnName);
+                    builder_where.Append(propertyInfo.Name);
+                    builder_where.Append("=");
+                    builder_where.Append("@");
+                    builder_where.Append(propertyInfo.Name);
 
-                        sqlParameterList.Add(new SqlParameter("@" + keyAttr.ColumnName, propertyInfo.GetValue(entity)));
-                    }
-                    else
-                    {
-                        builder_where.Append(propertyInfo.Name);
-                        builder_where.Append("=");
-                        builder_where.Append("@");
-                        builder_where.Append(propertyInfo.Name);
+                    sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
 
-                        sqlParameterList.Add(new SqlParameter("@" + propertyInfo.Name, propertyInfo.GetValue(entity)));
-                    }
                     keyCount++;
                 }
             }
@@ -1063,7 +970,7 @@ namespace QX_Frame.Helper_DG.Bantina
         public int ExecuteSql<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
         {
             string tableName = GetTablaName(typeof(TEntity));
-            string cacheKey = string.Concat("ExecuteSqlToList_int", tableName, sql).GetHashCode().ToString();
+            string cacheKey = string.Concat("ExecuteSql_int", tableName, sql).GetHashCode().ToString();
             object result = CacheChannel(tableName, cacheKey, () =>
               {
                   return ExecuteNonQuery(sql, CommandType.Text, parms);
@@ -1139,7 +1046,7 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <param name="cacheKey">cacheKey</param>
         /// <param name="func">Func<object></param>
         /// <returns></returns>
-        private object CacheChannel(string tableName, string cacheKey, Func<object> func)
+        private static object CacheChannel(string tableName, string cacheKey, Func<object> func)
         {
             /**
              * author:qixiao
@@ -1191,7 +1098,7 @@ namespace QX_Frame.Helper_DG.Bantina
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private string GetTablaName(Type type)
+        private static string GetTablaName(Type type)
         {
             object[] objs = type.GetCustomAttributes(typeof(TableAttribute), true);
             if (objs.FirstOrDefault() is TableAttribute attr)
@@ -1205,7 +1112,7 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="ds"></param>
         /// <returns></returns>
-        private TEntity ExecuteDataSetTo_TEntity<TEntity>(DataSet ds) where TEntity : class => ExecuteDataSetToList_TEntity<TEntity>(ds).FirstOrDefault();
+        private static TEntity ExecuteDataSetTo_TEntity<TEntity>(DataSet ds) where TEntity : class => ExecuteDataSetToList_TEntity<TEntity>(ds).FirstOrDefault();
 
         /// <summary>
         /// ExecuteDataSetToList_TEntity
@@ -1213,53 +1120,70 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="ds"></param>
         /// <returns></returns>
-        private List<TEntity> ExecuteDataSetToList_TEntity<TEntity>(DataSet ds) where TEntity : class
+        private static List<TEntity> ExecuteDataSetToList_TEntity<TEntity>(DataSet ds) where TEntity : class
         {
             try
             {
                 List<TEntity> list = new List<TEntity>();//instantiate a list object
-                PropertyInfo[] propertyInfos = typeof(TEntity).GetProperties();     //获取T对象的所有公共属性
+                PropertyInfo[] propertyInfos = typeof(TEntity).GetProperties();     //get properties
 
-                DataTable dt = ds.Tables[0];    // 获取到ds的dt
+                DataTable dt = ds.Tables[0];    //get datatable
                 if (dt.Rows.Count > 0)
                 {
-                    //判断读取的行是否>0 即数据库数据已被读取
                     foreach (DataRow row in dt.Rows)
                     {
-                        TEntity model = System.Activator.CreateInstance<TEntity>();//实例化一个对象，便于往list里填充数据
+                        TEntity model = System.Activator.CreateInstance<TEntity>();//create instance of entity
+                        string keyName = default(string);
                         foreach (PropertyInfo propertyInfo in propertyInfos)
                         {
+                            if (propertyInfo.GetCustomAttribute(typeof(ForeignKeyAttribute), true) is ForeignKeyAttribute foreignKeyAttr)
+                                keyName = propertyInfo.Name;
+
                             if (propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) is KeyAttribute keyAttr)
                             {
-                                if (!string.IsNullOrEmpty(keyAttr.ColumnName))
-                                {
-                                    model = SetValueToTEntityFromRows(model, propertyInfo, row, keyAttr.ColumnName);
-                                }
-                                else
-                                {
-                                    model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
-                                }
+                                model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
+                                keyName = propertyInfo.Name;
                                 continue;
                             }
 
+                            //column
                             if (propertyInfo.GetCustomAttribute(typeof(ColumnAttribute), true) is ColumnAttribute columnAttr)
                             {
-                                if (!string.IsNullOrEmpty(columnAttr.ColumnName))
+                                model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
+                                continue;
+                            }
+
+                            //if foreignKey
+                            /**
+                             * Update:2017-8-22 16:22:13
+                             * Desc:plus foreign search support
+                             * */
+                            if (propertyInfo.GetCustomAttribute(typeof(ForeignTableAttribute), true) is ForeignTableAttribute foreignTableAttr)
+                            {
+                                //set current key value to keyValue then call ForeignQueryEntity to get foreign value
+                                if (string.IsNullOrEmpty(keyName))
+                                    throw new Exception_DG("foreign table must support key column ! -- qixiao");
+
+                                //Generate a list.
+                                Type generic = typeof(List<>).MakeGenericType(new Type[] { propertyInfo.PropertyType });
+                                var propertyList = Activator.CreateInstance(generic) as IList;
+                                //get query values from method ForeignQueryEntity and set value to list.
+                                propertyList = _foreignQueryEntity.MakeGenericMethod(propertyInfo.PropertyType).Invoke(null,null) as IList;
+
+                                foreach (var item in propertyList)
                                 {
-                                    model = SetValueToTEntityFromRows(model, propertyInfo, row, columnAttr.ColumnName);
-                                }
-                                else
-                                {
-                                    model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
+                                    /**
+                                     * 1.get the foerign table KeyAttribute marked PropertyInfo
+                                     * 2.get KeyAttribute PropertyInfo`s value from foreign table instance
+                                     * 3.compare the value ,set foreign object value if match (LIKE linq FirstOrDefault() method); 
+                                     * */
+                                    if (GetOnlyOneKeyAttributeMarkPropertyInfo(propertyInfo.PropertyType).GetValue(item).Equals(row[keyName]))
+                                    {
+                                        propertyInfo.SetValue(model, item);
+                                        break;
+                                    }
                                 }
                             }
-                            /**
-                             * if property dosenot have ColumnAttribute or Key Attribute cannot be scan
-                             */
-                            //else
-                            //{
-                            //    model = SetValueToTEntityFromRows(model, propertyInfo, row, propertyInfo.Name);
-                            //}
                         }
                         list.Add(model);
                     }
@@ -1281,16 +1205,15 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <param name="row"></param>
         /// <param name="columnName"></param>
         /// <returns></returns>
-        private TEntity SetValueToTEntityFromRows<TEntity>(TEntity entity, PropertyInfo propertyInfo, DataRow row, string columnName)
+        private static TEntity SetValueToTEntityFromRows<TEntity>(TEntity entity, PropertyInfo propertyInfo, DataRow row, string columnName)
         {
             if (row[columnName] != System.DBNull.Value)
             {
-                //判断值是否为空，如果空赋值为null见else
                 if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
                 {
-                    //如果convertsionType为nullable类，声明一个NullableConverter类，该类提供从Nullable类到基础基元类型的转换
+                    //if convertsionType is type of nullable，declare a NullableConverter class that support method of convert Nullable class to underlyingType -- qi xiao
                     NullableConverter nullableConverter = new NullableConverter(propertyInfo.PropertyType);
-                    //将convertsionType转换为nullable对的基础基元类型
+                    //convert nullable type to underlying type -- qixiao
                     propertyInfo.SetValue(entity, Convert.ChangeType(row[columnName], nullableConverter.UnderlyingType), null);
                 }
                 else
@@ -1300,9 +1223,111 @@ namespace QX_Frame.Helper_DG.Bantina
             }
             else
             {
-                propertyInfo.SetValue(entity, null, null);//如果数据库的值为空，则赋值为null
+                propertyInfo.SetValue(entity, null, null);
             }
             return entity;
+        }
+
+        #region Help Method with Reflector
+        /// <summary>
+        /// MethodInfo
+        /// </summary>
+        private static readonly MethodInfo _foreignQueryEntity = typeof(Bantina).GetMethod("QueryForeignEntity", BindingFlags.NonPublic | BindingFlags.Static);
+        #endregion
+
+        /// <summary>
+        /// ForeignQueryEntity
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="value">value</param>
+        /// <returns></returns>
+        private static List<TEntity> QueryForeignEntity<TEntity>() where TEntity : class
+        {
+            string tableName = GetTablaName(typeof(TEntity));
+
+            string sql = $"SELECT * FROM {tableName}";
+
+            /**
+             * update query single each item to query * and storage into cache,then get value from cache
+             * means the foreign Table may query all from database
+             * -- qixiao 2017-8-22 17:12:50 
+             * */
+
+            //StringBuilder builder = new StringBuilder();
+
+            //builder.Append("SELECT TOP (1) * FROM ");
+            //builder.Append(tableName);
+            //builder.Append(" where ");
+
+            //SqlParameter[] parms = new SqlParameter[1];
+
+            //int keyCount = 0;
+            //PropertyInfo[] propertyInfos = typeof(TEntity).GetProperties();
+            //foreach (PropertyInfo propertyInfo in propertyInfos)
+            //{
+            //    //key :
+            //    if (propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) is KeyAttribute keyAttr)
+            //    {
+            //        builder.Append(propertyInfo.Name);
+            //        builder.Append("=");
+            //        builder.Append("@");
+            //        builder.Append(propertyInfo.Name);
+            //        parms[0] = new SqlParameter(propertyInfo.Name, value);
+
+            //        keyCount++;
+            //    }
+            //}
+
+            //if (keyCount == 0)
+            //{
+            //    throw new Exception_DG("[KeyAttribute] must be provide.");
+            //}
+            //else if (keyCount > 1)
+            //{
+            //    throw new Exception_DG("[KeyAttribute] only one suppport.");
+            //}
+
+            //Generate SqlStatement
+            //string sql = builder.ToString();
+
+            //Cache Support
+            string cacheKey = string.Concat("QueryForeignEntity_TEntity", tableName, sql).GetHashCode().ToString();
+
+            object result = CacheChannel(tableName, cacheKey, () =>
+            {
+                return ExecuteDataSetToList_TEntity<TEntity>(ExecuteDataSet(sql));
+            });
+
+            return result as List<TEntity>;
+        }
+
+        /// <summary>
+        /// Get Key PropertyInfo from classType
+        /// </summary>
+        /// <param name="classType"></param>
+        /// <returns></returns>
+        private static PropertyInfo GetOnlyOneKeyAttributeMarkPropertyInfo(Type classType)
+        {
+            int keyCount = 0;
+            PropertyInfo property = default(PropertyInfo);
+            foreach (PropertyInfo propertyInfo in classType.GetProperties())
+            {
+                //key :
+                if (propertyInfo.GetCustomAttribute(typeof(KeyAttribute), true) is KeyAttribute keyAttr)
+                {
+                    property = propertyInfo;
+                    keyCount++;
+                }
+            }
+            if (keyCount == 0)
+            {
+                throw new Exception_DG("[KeyAttribute] must be provide.");
+            }
+            else if (keyCount > 1)
+            {
+                throw new Exception_DG("[KeyAttribute] only one suppport.");
+            }
+            return property;
         }
 
         #endregion

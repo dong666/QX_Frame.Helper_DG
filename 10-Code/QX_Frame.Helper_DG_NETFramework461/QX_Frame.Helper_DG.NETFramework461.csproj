@@ -90,6 +90,7 @@
     <Compile Include="Bantina\AutoIncreaseAttribute.cs" />
     <Compile Include="Bantina\Bantina.cs" />
     <Compile Include="Bantina\ColumnAttribute.cs" />
+    <Compile Include="Bantina\ForeignAttribute.cs" />
     <Compile Include="Bantina\KeyAttribute.cs" />
     <Compile Include="Bantina\TableAttribute.cs" />
     <Compile Include="Cache_Helper_DG.cs" />

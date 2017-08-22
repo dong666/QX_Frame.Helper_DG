@@ -2,7 +2,7 @@
  * CopyRight: QIXIAO CODE BUILDER. 
  * Version:4.2.0
  * Author:qixiao(柒小)
- * Create:2017-8-7 10:19:35
+ * Create:2017-08-22 13:55:29
  * E-mail: dong@qixiao.me | wd8622088@foxmail.com 
  * Personal WebSit: http://qixiao.me 
  * Technical WebSit: http://www.cnblogs.com/qixiaoyizhan/ 
@@ -13,9 +13,8 @@ using System;
 
 namespace QX_Frame.Helper_DG.Bantina
 {
-    /// <summary>
-    /// Self Define Attribute , Support Properties/Class Support Extend Inherit
-    /// </summary>
     [AttributeUsage(AttributeTargets.Property, Inherited = true)]
-    public class ColumnAttribute : Attribute { }
+    public class ForeignKeyAttribute : Attribute { }
+    [AttributeUsage(AttributeTargets.Property, Inherited = true)]
+    public class ForeignTableAttribute : Attribute { }
 }

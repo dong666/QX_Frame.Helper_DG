@@ -40,19 +40,16 @@ namespace Test.ConsoleApp1.NETFramework461
 
             using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
             {
-                test.ExecuteSql<TB_People>("");
+                //test.ExecuteSql<TB_People>("");
                 //List<TB_People> peopleList = test.QueryEntitiesPaging<TB_People, string>(1, 5, t => t.Name, t => t.Name.StartsWith("li"), out int count, true);
                 List<TB_People> peopleList = test.QueryEntities<TB_People>();
+                //List<TB_People> peopleList = test.QueryEntities<TB_People>();
                 foreach (var item in peopleList)
                 {
-                    Console.WriteLine(item.Uid + " " + item.Name_DD + " " + item.Age);
+                    Console.WriteLine($"uid = {item.Uid} , Name = {item.Name} , ClassName = {item.TB_ClassName.ClassName}");
                 }
                 Console.WriteLine("-----------------");
-                List<TB_People> peopleList3 = test.QueryEntities<TB_People>();
-                foreach (var item in peopleList3)
-                {
-                    Console.WriteLine(item.Uid + " " + item.Name_DD + " " + item.Age);
-                }
+
                 //Console.WriteLine(count);
             }
 
@@ -70,22 +67,35 @@ namespace Test.ConsoleApp1.NETFramework461
     }
 
 
-    public class DB_QX_Frame_Test:Bantina
+    public class DB_QX_Frame_Test : Bantina
     {
         public DB_QX_Frame_Test() : base("data source=.;initial catalog=DB_QX_Frame_Test;persist security info=True;user id=Sa;password=Sa123456;MultipleActiveResultSets=True;App=EntityFramework") { }
-       
+
     }
 
-    [TableAttribute(TableName = "TB_People")]
+    [Table(TableName = "TB_People")]
     public class TB_People
     {
-        [KeyAttribute]
+        [Key]
         public Guid Uid { get; set; }
-        [Column(ColumnName ="Name")]
-        public string Name_DD { get; set; }
+        [Column]
+        public string Name { get; set; }
+        [Column]
         public int Age { get; set; }
+        [Column]
+        [ForeignKey]
         public int ClassId { get; set; }
-
+        [ForeignTable]
+        public TB_ClassName TB_ClassName { get; set; }
     }
 
+    [Table(TableName = "TB_ClassName")]
+    public class TB_ClassName
+    {
+        // PK（identity）  
+        [Key]
+        public Int32 ClassId { get; set; }
+        [Column]
+        public String ClassName { get; set; }
+    }
 }

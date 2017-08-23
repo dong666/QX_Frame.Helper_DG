@@ -57,6 +57,18 @@ namespace QX_Frame.Helper_DG.Bantina
 
     public abstract class Bantina : Sql_Helper_DG, IDisposable, IBantina
     {
+        /// <summary>
+        /// ConnectionString_READ
+        /// </summary>
+        public string ConnectionString_READ { get; set; }
+        /// <summary>
+        /// ConnectionString_WRITE
+        /// </summary>
+        public string ConnectionString_WRITE { get; set; }
+        /// <summary>
+        /// Execute SqlStatement
+        /// </summary>
+        public string SqlStatement { get; set; }
         #region Constructor
         /// <summary>
         /// Bantina
@@ -67,13 +79,20 @@ namespace QX_Frame.Helper_DG.Bantina
             {
                 throw new Exception_DG("ConnString_Default Must Be Declared When Initiation ! -- QX_Frame.Helper_DG.Bantina");
             }
+            this.ConnectionString_READ = ConnString_Default;
+            this.ConnectionString_WRITE = ConnString_Default;
         }
 
         /// <summary>
         /// Bantina
         /// </summary>
         /// <param name="connString"></param>
-        public Bantina(string connString) => ConnString_Default = connString;
+        public Bantina(string connString)
+        {
+            ConnString_Default = connString;
+            this.ConnectionString_READ = ConnString_Default;
+            this.ConnectionString_WRITE = ConnString_Default;
+        }
 
         /// <summary>
         /// Bantina
@@ -84,6 +103,8 @@ namespace QX_Frame.Helper_DG.Bantina
         {
             ConnString_RW = connString_RW;
             ConnString_R = connString_R;
+            this.ConnectionString_READ = ConnString_RW;
+            this.ConnectionString_WRITE = ConnString_R;
         }
 
         #endregion
@@ -160,6 +181,8 @@ namespace QX_Frame.Helper_DG.Bantina
 
             //Generate SqlStatement
             string sql = builder_front.Append(builder_behind.ToString()).ToString();
+
+            this.SqlStatement = sql;
 
             bool result = false;
 
@@ -257,6 +280,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder_front.Append(builder_where.ToString()).ToString();
 
+            this.SqlStatement = sql;
+
             bool result = false;
 
             //Execute Task That Execute SqlStatement
@@ -342,6 +367,8 @@ namespace QX_Frame.Helper_DG.Bantina
 
             string sql = builder_front.Append(lambdaString.LambdaToSqlStatement()).ToString();
 
+            this.SqlStatement = sql;
+
             bool result = false;
 
             //Execute Task That Execute SqlStatement
@@ -412,6 +439,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder_front.Append(builder_where.ToString()).ToString();
 
+            this.SqlStatement = sql;
+
             bool result = false;
 
             //Execute Task That Execute SqlStatement
@@ -451,6 +480,8 @@ namespace QX_Frame.Helper_DG.Bantina
 
             //Generate SqlStatement
             string sql = builder_front.ToString();
+
+            this.SqlStatement = sql;
 
             bool result = false;
 
@@ -492,6 +523,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
+            this.SqlStatement = sql;
+
             //Cache Support
             string cacheKey = string.Concat("QueryExist_bool", tableName, sql).GetHashCode().ToString();
 
@@ -514,6 +547,8 @@ namespace QX_Frame.Helper_DG.Bantina
 
             //Generate SqlStatement
             string sql = "SELECT COUNT(0) FROM " + tableName;
+
+            this.SqlStatement = sql;
 
             //Cache Support
             string cacheKey = string.Concat("QueryCount_int", tableName, sql).GetHashCode().ToString();
@@ -549,6 +584,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
+            this.SqlStatement = sql;
+
             //Cache Support
             string cacheKey = string.Concat("QueryCount_int", tableName, sql).GetHashCode().ToString();
 
@@ -582,6 +619,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
+            this.SqlStatement = sql;
+
             //Cache Support
             string cacheKey = string.Concat("QueryEntity_TEntity", tableName, sql).GetHashCode().ToString();
 
@@ -604,6 +643,8 @@ namespace QX_Frame.Helper_DG.Bantina
 
             //Generate SqlStatement
             string sql = "SELECT * FROM " + tableName;
+
+            this.SqlStatement = sql;
 
             //Cache Support
             string cacheKey = string.Concat("QueryEntities_List<TEntity>", tableName, sql).GetHashCode().ToString();
@@ -637,6 +678,8 @@ namespace QX_Frame.Helper_DG.Bantina
 
             //Generate SqlStatement
             string sql = builder.ToString();
+
+            this.SqlStatement = sql;
 
             //Cache Support
             string cacheKey = string.Concat("QueryEntities_List<TEntity>", tableName, sql).GetHashCode().ToString();
@@ -688,6 +731,8 @@ namespace QX_Frame.Helper_DG.Bantina
 
             //Generate SqlStatement
             string sql = builder.ToString();
+
+            this.SqlStatement = sql;
 
             //Cache Support
             string cacheKey = string.Concat("QueryEntitiesPaging_List<TEntity>", tableName, sql).GetHashCode().ToString();
@@ -745,6 +790,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
+            this.SqlStatement = sql;
+
             //Cache Support
             string cacheKey = string.Concat("QueryEntitiesPaging_List<TEntity>", tableName, sql).GetHashCode().ToString();
 
@@ -796,6 +843,8 @@ namespace QX_Frame.Helper_DG.Bantina
 
             //Generate SqlStatement
             string sql = builder.ToString();
+
+            this.SqlStatement = sql;
 
             count = QueryCount<TEntity>();
 
@@ -856,6 +905,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
+            this.SqlStatement = sql;
+
             //Get Data Count
             count = QueryCount(where);
 
@@ -892,6 +943,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
+            this.SqlStatement = sql;
+
             //Cache Support
             string cacheKey = string.Concat("QueryDataTable_DataTable", tableName, sql).GetHashCode().ToString();
 
@@ -904,6 +957,9 @@ namespace QX_Frame.Helper_DG.Bantina
 
         public DataTable QueryDataTable<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
         {
+
+            this.SqlStatement = sql;
+
             string tableName = GetTablaName(typeof(TEntity));
             string cacheKey = string.Concat("QueryDataTable_DataTable", tableName, sql).GetHashCode().ToString();
             object result = CacheChannel(tableName, cacheKey, () =>
@@ -935,6 +991,8 @@ namespace QX_Frame.Helper_DG.Bantina
             //Generate SqlStatement
             string sql = builder.ToString();
 
+            this.SqlStatement = sql;
+
             //Cache Support
             string cacheKey = string.Concat("QueryDataDataSet_DataSet", tableName, sql).GetHashCode().ToString();
 
@@ -948,6 +1006,7 @@ namespace QX_Frame.Helper_DG.Bantina
 
         public DataSet QueryDataDataSet<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
         {
+            this.SqlStatement = sql;
             string tableName = GetTablaName(typeof(TEntity));
             string cacheKey = string.Concat("QueryDataDataSet_DataSet", tableName, sql).GetHashCode().ToString();
             object result = CacheChannel(tableName, cacheKey, () =>
@@ -969,6 +1028,7 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <returns></returns>
         public int ExecuteSql<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
         {
+            this.SqlStatement = sql;
             string tableName = GetTablaName(typeof(TEntity));
             string cacheKey = string.Concat("ExecuteSql_int", tableName, sql).GetHashCode().ToString();
             object result = CacheChannel(tableName, cacheKey, () =>
@@ -989,6 +1049,7 @@ namespace QX_Frame.Helper_DG.Bantina
         /// <returns></returns>
         public List<TEntity> ExecuteSqlToList<TEntity>(string sql, params SqlParameter[] parms) where TEntity : class
         {
+            this.SqlStatement = sql;
             string tableName = GetTablaName(typeof(TEntity));
             string cacheKey = string.Concat("ExecuteSqlToList_List<TEntity>", tableName, sql).GetHashCode().ToString();
             object result = CacheChannel(tableName + cacheKey, cacheKey, () =>
@@ -1081,7 +1142,7 @@ namespace QX_Frame.Helper_DG.Bantina
         /// Transacation
         /// </summary>
         /// <param name="action"></param>
-        public static void Transaction(Action action)
+        public void Transaction(Action action)
         {
             using (TransactionScope trans = new TransactionScope())
             {

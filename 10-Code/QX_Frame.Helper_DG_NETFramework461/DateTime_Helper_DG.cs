@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QX_Frame.Helper_DG
 {
@@ -30,6 +26,26 @@ namespace QX_Frame.Helper_DG
         {
             TimeSpan ts = dateTimeUtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
             return Convert.ToInt64(ts.TotalSeconds);
+        }
+
+        /// <summary>
+        /// CodeExecuteTimeCaculate
+        /// Create:2017-8-23 09:50:28
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static double CodeExecuteTimeCaculate(Action action)
+        {
+            //instance a StopWatch
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            //sw start
+            sw.Start();
+            //Execute Code
+            action();
+            //sw stop
+            sw.Stop();
+            //return result
+            return sw.Elapsed.TotalMilliseconds;
         }
     }
 }

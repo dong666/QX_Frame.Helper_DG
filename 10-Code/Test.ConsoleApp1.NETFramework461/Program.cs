@@ -34,33 +34,97 @@ namespace Test.ConsoleApp1.NETFramework461
             //string str1 = "csacsacascsa";
             //string str2 = "1233";
 
-            //Console.WriteLine(people1.GetHashCode());
-            //Console.WriteLine(people2.GetHashCode());
-
+            //using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            //{
+            //    //List<TB_People> peopleList = test.QueryEntitiesPaging<TB_People, string>(1, 5, t => t.Name, t => t.Name.StartsWith("li"), out int count, true);
+            //    List<TB_People> peopleList = test.QueryEntities<TB_People>();
+            //    Console.WriteLine("Query DataCount - > " + peopleList.Count);
+            //    foreach (var item in peopleList)
+            //    {
+            //        Console.WriteLine($"uid = {item.Uid} , Name = {item.Name} , ClassName = {item.TB_ClassName.ClassName}");
+            //    }
+            //}
 
             using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
             {
-                //test.ExecuteSql<TB_People>("");
-                //List<TB_People> peopleList = test.QueryEntitiesPaging<TB_People, string>(1, 5, t => t.Name, t => t.Name.StartsWith("li"), out int count, true);
                 List<TB_People> peopleList = test.QueryEntities<TB_People>();
-                //List<TB_People> peopleList = test.QueryEntities<TB_People>();
                 foreach (var item in peopleList)
                 {
                     Console.WriteLine($"uid = {item.Uid} , Name = {item.Name} , ClassName = {item.TB_ClassName.ClassName}");
                 }
-                Console.WriteLine("-----------------");
-
-                //Console.WriteLine(count);
             }
 
+            //#region QueryAll ExecuteTime
+
+            //Console.WriteLine($"QueryList Spend Time - Bantina 1: " + DateTime_Helper_DG.CodeExecuteTimeCaculate(() =>
+            // {
+            //     using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            //     {
+            //         List<TB_People> peopleList = test.QueryEntities<TB_People>(t=>t.Name.Contains("2"));
+            //         Console.WriteLine("Query DataCount - > " + peopleList.Count);
+            //     }
+            // }));
+
+            //Console.WriteLine($"QueryList Spend Time - Bantina 2: " + DateTime_Helper_DG.CodeExecuteTimeCaculate(() =>
+            //{
+            //    using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            //    {
+            //        List<TB_People> peopleList = test.QueryEntities<TB_People>();
+            //        Console.WriteLine("Query DataCount - > " + peopleList.Count);
+            //    }
+            //}));
+
+            //Console.WriteLine($"QueryList Spend Time - Bantina 3: " + DateTime_Helper_DG.CodeExecuteTimeCaculate(() =>
+            //{
+            //    using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            //    {
+            //        List<TB_People> peopleList = test.QueryEntities<TB_People>();
+            //        Console.WriteLine("Query DataCount - > " + peopleList.Count);
+            //    }
+            //}));
+
+            //#endregion
+
+            //#region QueryCondition ExecuteTime
+
+            //Console.WriteLine($"QueryList Spend Time - Bantina 1: " + DateTime_Helper_DG.CodeExecuteTimeCaculate(() =>
+            //{
+            //    using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            //    {
+            //        List<TB_People> peopleList = test.QueryEntities<TB_People>(t=>t.Name.Contains("1"));
+            //        Console.WriteLine("Query DataCount - > " + peopleList.Count);
+            //    }
+            //}));
+
+            //Console.WriteLine($"QueryList Spend Time - Bantina 2: " + DateTime_Helper_DG.CodeExecuteTimeCaculate(() =>
+            //{
+            //    using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            //    {
+            //        List<TB_People> peopleList = test.QueryEntities<TB_People>(t => t.Name.Contains("2"));
+            //        Console.WriteLine("Query DataCount - > " + peopleList.Count);
+            //    }
+            //}));
+
+            //Console.WriteLine($"QueryList Spend Time - Bantina 3: " + DateTime_Helper_DG.CodeExecuteTimeCaculate(() =>
+            //{
+            //    using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            //    {
+            //        List<TB_People> peopleList = test.QueryEntities<TB_People>(t => t.Name.Contains("3"));
+            //        Console.WriteLine("Query DataCount - > " + peopleList.Count);
+            //    }
+            //}));
+
+            //#endregion
 
 
-            //DataTable table = Office_Helper_DG.ImportExceltoDt(filePath, 0,0);
 
 
 
-            //---------
 
+
+
+
+            // --------------
             Console.WriteLine("any key to exit ...");
             Console.ReadKey();
         }
@@ -70,7 +134,6 @@ namespace Test.ConsoleApp1.NETFramework461
     public class DB_QX_Frame_Test : Bantina
     {
         public DB_QX_Frame_Test() : base("data source=.;initial catalog=DB_QX_Frame_Test;persist security info=True;user id=Sa;password=Sa123456;MultipleActiveResultSets=True;App=EntityFramework") { }
-
     }
 
     [Table(TableName = "TB_People")]
@@ -95,6 +158,7 @@ namespace Test.ConsoleApp1.NETFramework461
         // PK（identity）  
         [Key]
         public Int32 ClassId { get; set; }
+        //
         [Column]
         public String ClassName { get; set; }
     }

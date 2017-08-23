@@ -26,9 +26,21 @@ namespace Test.ConsoleApp1.NETFramework461
 
             //---------
 
-            //TB_People people1 = new TB_People { Name = "111" };
-            //TB_People people2 = people1;
-            //people1.Name = "44";
+            //TB_People people = new TB_People ();
+            //people.Uid = Guid.NewGuid();
+            //people.Name = "555";
+            //people.Age = 22;
+            //people.ClassId = 3;
+
+            using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            {
+                string sql = "select * from TB_People";
+                List<TB_People> peopleList = test.ExecuteSqlToList<TB_People>(sql, null);
+                foreach (var item in peopleList)
+                {
+                    Console.WriteLine($"uid = {item.Uid} , Name = {item.Name}");
+                }
+            }
 
 
             //string str1 = "csacsacascsa";
@@ -45,14 +57,14 @@ namespace Test.ConsoleApp1.NETFramework461
             //    }
             //}
 
-            using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
-            {
-                List<TB_People> peopleList = test.QueryEntities<TB_People>();
-                foreach (var item in peopleList)
-                {
-                    Console.WriteLine($"uid = {item.Uid} , Name = {item.Name} , ClassName = {item.TB_ClassName.ClassName}");
-                }
-            }
+            //using (DB_QX_Frame_Test test = new DB_QX_Frame_Test())
+            //{
+            //    List<TB_People> peopleList = test.QueryEntitiesPaging<TB_People, string>(1, 2, t => t.Name, t => t.Age == 3, out int count, true);
+            //    foreach (var item in peopleList)
+            //    {
+            //        Console.WriteLine($"uid = {item.Uid} , Name = {item.Name} , ClassName = {item.TB_ClassName.ClassName}");
+            //    }
+            //}
 
             //#region QueryAll ExecuteTime
 
@@ -148,8 +160,8 @@ namespace Test.ConsoleApp1.NETFramework461
         [Column]
         [ForeignKey]
         public int ClassId { get; set; }
-        [ForeignTable]
-        public TB_ClassName TB_ClassName { get; set; }
+        //[ForeignTable]
+        //public TB_ClassName TB_ClassName { get; set; }
     }
 
     [Table(TableName = "TB_ClassName")]
